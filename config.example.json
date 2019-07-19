@@ -1,0 +1,8 @@
+{
+    "server": "mumble://example.com",
+    "password": "password",
+    "bitrate": null,
+    "maxlength": 900,
+    "name": "nodejs",
+    "channel": "root"
+}
