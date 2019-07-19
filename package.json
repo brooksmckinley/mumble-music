@@ -1,0 +1,11 @@
+{
+  "name": "mumble-music",
+  "version": "0.0.1",
+  "description": "Mumble music bot",
+  "main": "server.js",
+  "author": "Brooks McKinley",
+  "dependencies": {
+    "hh-mm-ss": "^1.2.0",
+    "mumble": "^0.3.21"
+  }
+}
