@@ -56,7 +56,7 @@ mumble.connect(config.server, null, (e, connection) => {
 		// Set bitrate only if specified
 		if (config.bitrate) connection.connection.setBitrate(config.bitrate);
 		channel = connection.channelByName(config.channel);
-		if (!channel) channel = connection.rootChannel();
+		if (!channel) channel = connection.rootChannel;
 		// Automatically move back
 		connection.on("user-move", (user) => {
 			if (user.name == config.name) channel.join();
