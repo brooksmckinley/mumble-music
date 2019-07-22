@@ -1,8 +1,8 @@
 var mumble = require("mumble"),
-	fs = require("fs");
+fs = require("fs");
 
 var ytdl = require("./src/ytdl.js"),
-	SongQueue = require("./src/SongQueue.js");
+SongQueue = require("./src/SongQueue.js");
 
 var config = JSON.parse(fs.readFileSync("config.json")); 
 
@@ -45,24 +45,38 @@ function onMessage(msg, user, connection) {
 				"<li><span style='font-family: monospace'>!skip</span>: Skips the current song.</li>" +
 				"<li><span style='font-family: monospace'>!queue</span>: Displays a list of all the songs in the queue.</li>" +
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
-				"</ul>");
+		"</ul>");
 	}
 }
 
-mumble.connect(config.server, null, (e, connection) => {
-	if (e) throw e;
-	connection.authenticate(config.name, config.password);
-	connection.on("initialized", () => {
-		// Set bitrate only if specified
-		if (config.bitrate) connection.connection.setBitrate(config.bitrate);
-		channel = connection.channelByName(config.channel);
-		if (!channel) channel = connection.rootChannel;
-		// Automatically move back
-		connection.on("user-move", (user) => {
-			if (user.name == config.name) channel.join();
+function connect() {
+	mumble.connect(config.server, null, (e, connection) => {
+		if (e) throw e;
+		connection.authenticate(config.name, config.password);
+		connection.on("initialized", () => {
+			// Set bitrate only if specified
+			if (config.bitrate) connection.connection.setBitrate(config.bitrate);
+			channel = connection.channelByName(config.channel);
+			if (!channel) channel = connection.rootChannel;
+			// Automatically move back
+			connection.on("user-move", (user) => {
+				if (user.name == config.name) channel.join();
+			})
+			channel.join();
 		})
-		channel.join();
-	})
-	connection.on("message", (msg, user) => onMessage(msg, user, connection));
-});
+		connection.on("message", (msg, user) => onMessage(msg, user, connection));
+		// When the socket's closed, reconnect.
+		// I wouldn't have to do this if there was an event for it
+		connection.connection.socket.socket._events.close.push(() => {
+			// Reset globals
+			playing = false;
+			queue = new SongQueue(config);
+			channel = undefined;
+			// Reconnect
+			console.log("Connection lost. Reconnecting...")
+			connect();
+		})
+	});
+}
 
+connect();
