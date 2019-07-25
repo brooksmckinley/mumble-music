@@ -58,7 +58,7 @@ function onMessage(msg, user, connection) {
 			queue.start(connection);
 		}).catch((e) => {
 			console.log(e);
-			channel.sendMessage("Error adding " + url + ": " + e);
+			channel.sendMessage("Error adding \"" + arg + "\": " + e);
 		});
 	}
 }
