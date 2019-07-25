@@ -30,7 +30,12 @@ exports.download = function(url, filename) {
 		args.push(url);
 		console.log(args);
 		let proc = child_process.spawn("youtube-dl", args);
-		proc.on("exit", resolve);
+		proc.on("exit", (code) => {
+			if (code == 0) resolve();
+			else {
+				reject("Error downloading link.");
+			}
+		});
 		proc.on("error", (e) => {
 			reject("Error downloading link.");
 			console.log(e)
