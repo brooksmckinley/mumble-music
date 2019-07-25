@@ -44,8 +44,10 @@ function onMessage(msg, user, connection) {
 		channel.sendMessage("Command list: <br>" +
 				"<ul>" +
 				"<li><span style='font-family: monospace'>!play [url]</span>: Adds the URL to the queue.</li>" +
+				"<li><span style='font-family: monospace'>!search [title]</span>: Searches YouTube for the video title and adds the first result to the queue.</li>" +
 				"<li><span style='font-family: monospace'>!skip</span>: Skips the current song.</li>" +
 				"<li><span style='font-family: monospace'>!queue</span>: Displays a list of all the songs in the queue.</li>" +
+				"<li><span style='font-family: monospace'>!vol [volume]</span>: Sets the volume of the music bot. Volume must be a number between 1 and 100.</li>" +
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
 		"</ul>");
 	}
