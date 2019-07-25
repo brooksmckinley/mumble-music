@@ -23,7 +23,7 @@ exports.download = function(url, filename) {
 	return new Promise((resolve, reject) => {
 		let args = ["--no-playlist", "--playlist-items", "1", "--exec", "ffmpeg -i {} -ar 48000 -ac 1 -c:a pcm_s16le -f s16le -y " + filename + "; rm {}"];
 		// Only download the audio if it's on YouTube
-		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)")) {
+		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
 			args.push("-f");
 			args.push("bestaudio");
 		}
