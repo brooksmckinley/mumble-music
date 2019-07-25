@@ -47,6 +47,20 @@ function onMessage(msg, user, connection) {
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
 		"</ul>");
 	}
+	if (msg.startsWith("!search ")) {
+		let arg = msg.substring(8);
+		console.log("Searching for " + arg);
+		let url = "ytsearch:" + arg;
+
+		queue.addSong(url).then((song) => {
+			channel.sendMessage("Added \"" + song.name + "\" to queue.");
+			console.log(queue.getQueue());
+			queue.start(connection);
+		}).catch((e) => {
+			console.log(e);
+			channel.sendMessage("Error adding " + url + ": " + e);
+		});
+	}
 }
 
 function connect() {
