@@ -27,7 +27,7 @@ SongQueue.prototype.addSong = function(url) {
 }
 
 SongQueue.prototype.start = function(connection) {
-	console.log("start called: " + this.isPlaying);
+	console.debug("[DEBUG] isPlaying: " + this.isPlaying);
 	if (!this.isPlaying) {	
 		this.stream = connection.inputStream();
 		this.stream.setGain(0.25);

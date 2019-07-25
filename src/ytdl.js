@@ -28,7 +28,7 @@ exports.download = function(url, filename) {
 			args.push("bestaudio");
 		}
 		args.push(url);
-		console.log(args);
+		console.debug("[INFO] Downloading " + url);
 		let proc = child_process.spawn("youtube-dl", args);
 		proc.on("exit", (code) => {
 			if (code == 0) resolve();

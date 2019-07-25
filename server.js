@@ -12,23 +12,25 @@ var channel = undefined;
 
 
 function onMessage(msg, user, connection) {
-	console.log(user.name + ": " + msg);
 	if (msg.startsWith("!play ")) {
 		let arg = msg.substring(6);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-		console.log("Trying to play " + url + " from " + user.name);
+		console.info("[INFO] Trying to play " + url + " from " + user.name);
 
 		queue.addSong(url).then((song) => {
+			console.info("[INFO] Added \"" + song.name + "\" to queue.");
 			channel.sendMessage("Added \"" + song.name + "\" to queue.");
-			console.log(queue.getQueue());
 			queue.start(connection);
 		}).catch((e) => {
-			console.log(e);
+			console.warn("[WARN] Error adding " + url + ": " + e);
 			channel.sendMessage("Error adding " + url + ": " + e);
 		});
 	}
 	if (msg == "!skip") {
+		if (queue.isPlaying) {
+			console.info("[INFO] Skipping \"" + queue.nowPlaying.name + "\"");
+		}
 		queue.skip();
 	}
 	if (msg == "!queue") {
@@ -49,15 +51,15 @@ function onMessage(msg, user, connection) {
 	}
 	if (msg.startsWith("!search ")) {
 		let arg = msg.substring(8);
-		console.log("Searching for " + arg);
+		console.info("[INFO] Searching for " + arg);
 		let url = "ytsearch:" + arg;
 
 		queue.addSong(url).then((song) => {
+			console.info("[INFO] Added \"" + song.name + "\" to queue.");
 			channel.sendMessage("Added \"" + song.name + "\" to queue.");
-			console.log(queue.getQueue());
 			queue.start(connection);
 		}).catch((e) => {
-			console.log(e);
+			console.warn("[WARN] Error adding \"" + arg + "\": " + e);
 			channel.sendMessage("Error adding \"" + arg + "\": " + e);
 		});
 	}
@@ -65,7 +67,10 @@ function onMessage(msg, user, connection) {
 
 function connect() {
 	mumble.connect(config.server, null, (e, connection) => {
-		if (e) throw e;
+		if (e) {
+			console.error("[ERR] Unable to connect to the mumble server.");
+			throw e;
+		}
 		connection.authenticate(config.name, config.password);
 		connection.on("initialized", () => {
 			// Set bitrate only if specified
@@ -87,7 +92,7 @@ function connect() {
 			queue = new SongQueue(config);
 			channel = undefined;
 			// Reconnect
-			console.log("Connection lost. Reconnecting...")
+			console.warn("[WARN] Connection lost. Reconnecting...")
 			connect();
 		})
 	});
