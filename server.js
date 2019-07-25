@@ -63,6 +63,18 @@ function onMessage(msg, user, connection) {
 			channel.sendMessage("Error adding \"" + arg + "\": " + e);
 		});
 	}
+	if (msg.startsWith("!vol ")) {
+		let arg = msg.substring(5);
+		if (arg > 0 && arg <= 100) {
+			let gain = arg / 100;
+			queue.setGain(gain);
+			console.info("[INFO] Set volume to " + gain);
+		}
+		else {
+			console.warn("[WARN] Invalid volume: " + arg);
+			channel.sendMessage("Invalid volume. Please only use a volume from 1 to 100.");
+		}
+	}
 }
 
 function connect() {

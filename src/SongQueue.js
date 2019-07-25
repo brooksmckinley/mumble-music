@@ -7,6 +7,7 @@ function SongQueue(config) {
 	this.lastID = 0;
 	this.isPlaying = false;
 	this.maxDuration = config.maxlength;
+	this.gain = 0.25;
 } 
 
 SongQueue.prototype.addSong = function(url) {
@@ -30,7 +31,7 @@ SongQueue.prototype.start = function(connection) {
 	console.debug("[DEBUG] isPlaying: " + this.isPlaying);
 	if (!this.isPlaying) {	
 		this.stream = connection.inputStream();
-		this.stream.setGain(0.25);
+		this.stream.setGain(this.gain);
 		this.connection = connection;
 		this._play();
 	}
@@ -57,7 +58,7 @@ SongQueue.prototype.skip = function() {
 	this.stream.close();
 	this.stream = this.connection.inputStream();
 	this.isPlaying = false;
-	this.stream.setGain(0.25);
+	this.stream.setGain(this.gain);
 	if (this.queue.length != 0) this._play();
 }
 
@@ -69,6 +70,12 @@ SongQueue.prototype.getQueue = function() {
 	return res;
 }
 
+SongQueue.prototype.setGain = function(gain) {
+	this.gain = gain;
+	if (this.isPlaying) {
+		this.stream.setGain(gain);
+	}
+}
 function Song(name, duration, id) {
 	this.name = name;
 	this.duration = duration;
