@@ -43,20 +43,22 @@ SongQueue.prototype.start = function(connection) {
 }
 
 function read_buf(fd, buffer) {
-	
+
 }
 
 SongQueue.prototype._fillBuf = function() {
-	fs.read(this.fd, this.buf, 0, 48000, null, (err, bytesRead, buffer) => {
-		if (err) throw err;
-		this.stream.write(buffer);
-		if (bytesRead == 0) {
-			console.info("[INFO] Song timeout.");
-			fs.unlink(".tmp" + this.nowPlaying.id + ".wav", () => {});
-			if (this.queue.length == 0) this.isPlaying = false;
-			else this._play();
-		}
-	});
+	if (this.isPlaying) {
+		fs.read(this.fd, this.buf, 0, 48000, null, (err, bytesRead, buffer) => {
+			if (err) throw err;
+			this.stream.write(buffer);
+			if (bytesRead == 0) {
+				console.info("[INFO] Song timeout.");
+				fs.unlink(".tmp" + this.nowPlaying.id + ".wav", () => {});
+				if (this.queue.length == 0) this.isPlaying = false;
+				else this._play();
+			}
+		});
+	}
 }
 
 SongQueue.prototype._play = function() {
