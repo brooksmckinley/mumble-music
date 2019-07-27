@@ -42,10 +42,6 @@ SongQueue.prototype.start = function(connection) {
 	}
 }
 
-function read_buf(fd, buffer) {
-
-}
-
 SongQueue.prototype._fillBuf = function() {
 	if (this.isPlaying) {
 		fs.read(this.fd, this.buf, 0, 48000, null, (err, bytesRead, buffer) => {
