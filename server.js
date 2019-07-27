@@ -77,6 +77,15 @@ function onMessage(msg, user, connection) {
 			channel.sendMessage("Invalid volume. Please only use a volume from 1 to 100.");
 		}
 	}
+	if (msg == "!pause") {
+		console.info("[INFO] Paused.");
+		queue.pause();
+		channel.sendMessage("Paused.");
+	}
+	if (msg == "!resume") {
+		queue.resume();
+		console.info("[INFO] Resumed.");
+	}
 }
 
 function connect() {

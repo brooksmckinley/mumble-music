@@ -49,12 +49,17 @@ SongQueue.prototype._fillBuf = function() {
 			this.stream.write(buffer);
 			if (bytesRead == 0) {
 				console.info("[INFO] Song timeout.");
-				fs.unlink(".tmp" + this.nowPlaying.id + ".wav", () => {});
+				this._delete();
 				if (this.queue.length == 0) this.isPlaying = false;
 				else this._play();
 			}
 		});
 	}
+}
+
+SongQueue.prototype._delete = function() {
+	fs.closeSync(this.fd);
+	fs.unlinkSync(".tmp." + this.nowPlaying.id + ".wav");
 }
 
 SongQueue.prototype._play = function() {
@@ -67,13 +72,27 @@ SongQueue.prototype._play = function() {
 
 SongQueue.prototype.skip = function() {
 	this.stream.close();
+	this._delete();
 	this._createStream();
 	this.isPlaying = false;
+	this.isPaused = false;
 	if (this.queue.length != 0) this._play();
+}
+
+SongQueue.prototype.pause = function() {
+	this.stream.close();
+	this._createStream();
+	this.isPaused = true;
+}
+
+SongQueue.prototype.resume = function() {
+	if (this.isPaused) this._fillBuf();
+	this.isPaused = false;
 }
 
 SongQueue.prototype.getQueue = function() {
 	res = "";
+	if (this.isPaused) res += "[PAUSED] ";
 	for (let song of this.queue) {
 		res += song.name + ": " + hhmmss.fromS(song.duration) + "\n";
 	}
