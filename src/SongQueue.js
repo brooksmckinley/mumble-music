@@ -8,8 +8,14 @@ function SongQueue(config) {
 	this.isPlaying = false;
 	this.maxDuration = config.maxlength;
 	this.gain = 0.25;
+	this.buf = Buffer.alloc(48000);
 } 
 
+SongQueue.prototype._createStream = function() {
+	this.stream = this.connection.inputStream();
+	this.stream.setGain(this.gain);
+	this.stream.on('drain', () => this._fillBuf());
+}
 SongQueue.prototype.addSong = function(url) {
 	return new Promise((resolve, reject) => {
 		ytdl.details(url).then((details) => {
@@ -30,35 +36,41 @@ SongQueue.prototype.addSong = function(url) {
 SongQueue.prototype.start = function(connection) {
 	console.debug("[DEBUG] isPlaying: " + this.isPlaying);
 	if (!this.isPlaying) {	
-		this.stream = connection.inputStream();
-		this.stream.setGain(this.gain);
 		this.connection = connection;
+		this._createStream();
 		this._play();
 	}
 }
 
-SongQueue.prototype._play = function() {
-	let song = this.queue.shift();
-	let songData = fs.readFileSync(".tmp." + song.id + ".wav");
-	this.stream.write(songData);
-	this.nowPlaying = song;
-	this.isPlaying = true;
-	fs.unlinkSync(".tmp." + song.id + ".wav");
-	// Re-call _play() if no one skipped the song
-	setTimeout(() => {
-		if (this.nowPlaying.id == song.id) {
-			console.log("song timeout");
+function read_buf(fd, buffer) {
+	
+}
+
+SongQueue.prototype._fillBuf = function() {
+	fs.read(this.fd, this.buf, 0, 48000, null, (err, bytesRead, buffer) => {
+		if (err) throw err;
+		this.stream.write(buffer);
+		if (bytesRead == 0) {
+			console.info("[INFO] Song timeout.");
+			fs.unlink(".tmp" + this.nowPlaying.id + ".wav", () => {});
 			if (this.queue.length == 0) this.isPlaying = false;
 			else this._play();
 		}
-	}, (song.duration + 3) * 1000);
+	});
+}
+
+SongQueue.prototype._play = function() {
+	let song = this.queue.shift();
+	this.nowPlaying = song;
+	this.isPlaying = true;
+	this.fd = fs.openSync(".tmp." + song.id + ".wav", 'r', 666);
+	this._fillBuf();
 }
 
 SongQueue.prototype.skip = function() {
 	this.stream.close();
-	this.stream = this.connection.inputStream();
+	this._createStream();
 	this.isPlaying = false;
-	this.stream.setGain(this.gain);
 	if (this.queue.length != 0) this._play();
 }
 
