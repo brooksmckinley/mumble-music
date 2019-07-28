@@ -12,6 +12,7 @@ var channel = undefined;
 
 
 function onMessage(msg, user, connection) {
+	// Queue mode commands
 	if (msg.startsWith("!play ")) {
 		let arg = msg.substring(6);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
@@ -39,20 +40,6 @@ function onMessage(msg, user, connection) {
 			msg += "Now playing: " + queue.nowPlaying.name + "<br>";
 		msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
 		channel.sendMessage(msg);
-	}
-	if (msg == "!debug") {
-		console.log(queue);
-	}
-	if (msg == "!help") {
-		channel.sendMessage("Command list: <br>" +
-				"<ul>" +
-				"<li><span style='font-family: monospace'>!play [url]</span>: Adds the URL to the queue.</li>" +
-				"<li><span style='font-family: monospace'>!search [title]</span>: Searches YouTube for the video title and adds the first result to the queue.</li>" +
-				"<li><span style='font-family: monospace'>!skip</span>: Skips the current song.</li>" +
-				"<li><span style='font-family: monospace'>!queue</span>: Displays a list of all the songs in the queue.</li>" +
-				"<li><span style='font-family: monospace'>!vol [volume]</span>: Sets the volume of the music bot. Volume must be a number between 1 and 100.</li>" +
-				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
-		"</ul>");
 	}
 	if (msg.startsWith("!search ")) {
 		let arg = msg.substring(8);
@@ -88,6 +75,22 @@ function onMessage(msg, user, connection) {
 	if (msg == "!resume") {
 		queue.resume();
 		console.info("[INFO] Resumed.");
+	}
+
+	// Global commands
+	if (msg == "!debug") {
+		console.log(queue);
+	}
+	if (msg == "!help") {
+		channel.sendMessage("Command list: <br>" +
+				"<ul>" +
+				"<li><span style='font-family: monospace'>!play [url]</span>: Adds the URL to the queue.</li>" +
+				"<li><span style='font-family: monospace'>!search [title]</span>: Searches YouTube for the video title and adds the first result to the queue.</li>" +
+				"<li><span style='font-family: monospace'>!skip</span>: Skips the current song.</li>" +
+				"<li><span style='font-family: monospace'>!queue</span>: Displays a list of all the songs in the queue.</li>" +
+				"<li><span style='font-family: monospace'>!vol [volume]</span>: Sets the volume of the music bot. Volume must be a number between 1 and 100.</li>" +
+				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
+		"</ul>");
 	}
 }
 
