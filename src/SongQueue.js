@@ -71,12 +71,14 @@ SongQueue.prototype._play = function() {
 }
 
 SongQueue.prototype.skip = function() {
-	this.stream.close();
-	this._delete();
-	this._createStream();
-	this.isPlaying = false;
-	this.isPaused = false;
-	if (this.queue.length != 0) this._play();
+	if (this.isPlaying) {
+		this.stream.close();
+		this._delete();
+		this._createStream();
+		this.isPlaying = false;
+		this.isPaused = false;
+		if (this.queue.length != 0) this._play();
+	}
 }
 
 SongQueue.prototype.pause = function() {
@@ -92,7 +94,6 @@ SongQueue.prototype.resume = function() {
 
 SongQueue.prototype.getQueue = function() {
 	res = "";
-	if (this.isPaused) res += "[PAUSED] ";
 	for (let song of this.queue) {
 		res += song.name + ": " + hhmmss.fromS(song.duration) + "\n";
 	}

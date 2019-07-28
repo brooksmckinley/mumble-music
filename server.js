@@ -30,12 +30,15 @@ function onMessage(msg, user, connection) {
 	if (msg == "!skip") {
 		if (queue.isPlaying) {
 			console.info("[INFO] Skipping \"" + queue.nowPlaying.name + "\"");
+			queue.skip();
 		}
-		queue.skip();
 	}
 	if (msg == "!queue") {
-		channel.sendMessage("Now playing: " + queue.nowPlaying.name + "<br>" +
-				"Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>"));
+		let msg = "";
+		if (queue.isPlaying) 
+			msg += "Now playing: " + queue.nowPlaying.name + "<br>";
+		msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
+		channel.sendMessage(msg);
 	}
 	if (msg == "!debug") {
 		console.log(queue);
