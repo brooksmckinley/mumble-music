@@ -28,14 +28,14 @@ function onMessage(msg, user, connection) {
 		});
 	}
 	if (msg == "!skip") {
-		if (queue.isPlaying) {
+		if (queue.isPlaying()) {
 			console.info("[INFO] Skipping \"" + queue.nowPlaying.name + "\"");
 			queue.skip();
 		}
 	}
 	if (msg == "!queue") {
 		let msg = "";
-		if (queue.isPlaying) 
+		if (queue.isPlaying()) 
 			msg += "Now playing: " + queue.nowPlaying.name + "<br>";
 		msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
 		channel.sendMessage(msg);
