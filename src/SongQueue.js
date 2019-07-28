@@ -9,6 +9,8 @@ function SongQueue(config) {
 	this.maxDuration = config.maxlength;
 } 
 
+// Exposing data structures of the player
+
 SongQueue.prototype.isPlaying = function() {
 	if (!this.player) return false;
 	return this.player.isPlaying;

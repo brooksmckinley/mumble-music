@@ -2,64 +2,117 @@ var mumble = require("mumble"),
 fs = require("fs");
 
 var ytdl = require("./src/ytdl.js"),
-SongQueue = require("./src/SongQueue.js");
+SongQueue = require("./src/SongQueue.js"),
+Playlist = require("./src/Playlist.js");
 
 var config = JSON.parse(fs.readFileSync("config.json")); 
 
+const Modes = {
+		QUEUE: 0,
+		PLAYLIST: 1
+};
+
 var playing = false;
+var mode = Modes.QUEUE;
 var queue = new SongQueue(config);
+var playlist;
+var playlistID = 0; // ID for playlist temp files to prevent collisions
 var channel = undefined;
 
 
 function onMessage(msg, user, connection) {
 	// Queue mode commands
-	if (msg.startsWith("!play ")) {
-		let arg = msg.substring(6);
-		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
-		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-		console.info("[INFO] Trying to play " + url + " from " + user.name);
+	if (mode == Modes.QUEUE) {
+		if (msg.startsWith("!play ")) {
+			let arg = msg.substring(6);
+			if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+			let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+			console.info("[INFO] Trying to play " + url + " from " + user.name);
 
-		queue.addSong(url).then((song) => {
-			console.info("[INFO] Added \"" + song.name + "\" to queue.");
-			channel.sendMessage("Added \"" + song.name + "\" to queue.");
-			queue.start(connection);
-		}).catch((e) => {
-			console.warn("[WARN] Error adding " + url + ": " + e);
-			channel.sendMessage("Error adding " + url + ": " + e);
-		});
+			queue.addSong(url).then((song) => {
+				console.info("[INFO] Added \"" + song.name + "\" to queue.");
+				channel.sendMessage("Added \"" + song.name + "\" to queue.");
+				queue.start(connection);
+			}).catch((e) => {
+				console.warn("[WARN] Error adding " + url + ": " + e);
+				channel.sendMessage("Error adding " + url + ": " + e);
+			});
+		}
+		if (msg == "!skip") {
+			if (queue.isPlaying()) {
+				console.info("[INFO] Skipping \"" + queue.nowPlaying.name + "\"");
+				queue.skip();
+			}
+		}
+		if (msg == "!queue") {
+			let msg = "";
+			if (queue.isPlaying()) 
+				msg += "Now playing: " + queue.nowPlaying.name + "<br>";
+			msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
+			channel.sendMessage(msg);
+		}
+		if (msg.startsWith("!search ")) {
+			let arg = msg.substring(8);
+			console.info("[INFO] Searching for " + arg);
+			let url = "ytsearch:" + arg;
+
+			queue.addSong(url).then((song) => {
+				console.info("[INFO] Added \"" + song.name + "\" to queue.");
+				channel.sendMessage("Added \"" + song.name + "\" to queue.");
+				queue.start(connection);
+			}).catch((e) => {
+				console.warn("[WARN] Error adding \"" + arg + "\": " + e);
+				channel.sendMessage("Error adding \"" + arg + "\": " + e);
+			});
+		}
+
 	}
-	if (msg == "!skip") {
-		if (queue.isPlaying()) {
-			console.info("[INFO] Skipping \"" + queue.nowPlaying.name + "\"");
-			queue.skip();
+	
+	// Playlist mode commands
+	// TODO: user friendly rejections if someone tries to use a queue command in playlist mode
+	if (mode == Modes.PLAYLIST) {
+		if (msg == "!skip" && playlist.isPlaying()) {
+			console.info("[INFO/Playlist] Skipping " + playlist.nowPlaying.title);
+			playlist.skip();
+		}
+		if (msg == "!queue") {
+			res = "Now playing: " + playlist.nowPlaying.title + "<br>";
+			if (playlist.nextSong)
+				res += "Next: " + playlist.nextSong.title;
+			channel.sendMessage(res);
+		}
+		if (msg == "!stop") {
+			playlist.stop();
 		}
 	}
-	if (msg == "!queue") {
-		let msg = "";
-		if (queue.isPlaying()) 
-			msg += "Now playing: " + queue.nowPlaying.name + "<br>";
-		msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
-		channel.sendMessage(msg);
-	}
-	if (msg.startsWith("!search ")) {
-		let arg = msg.substring(8);
-		console.info("[INFO] Searching for " + arg);
-		let url = "ytsearch:" + arg;
 
-		queue.addSong(url).then((song) => {
-			console.info("[INFO] Added \"" + song.name + "\" to queue.");
-			channel.sendMessage("Added \"" + song.name + "\" to queue.");
-			queue.start(connection);
+	// Global commands
+	if (msg.startsWith("!playlist ")) {
+		if (mode == Modes.PLAYLIST) return; // TODO: Make this behavior a little more user friendly
+		let arg = msg.substring(10);
+		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+		console.info("[INFO] Starting playlist " + url);
+		Playlist.startPlaylist(url, playlistID++, connection, () => {
+			// shift modes back
+			mode = Modes.QUEUE;
+			playlist = undefined;
+			queue.resume();
+		}).then((pl) => {
+			playlist = pl;
+			// shift modes
+			mode = Modes.PLAYLIST;
+			queue.pause();
 		}).catch((e) => {
-			console.warn("[WARN] Error adding \"" + arg + "\": " + e);
-			channel.sendMessage("Error adding \"" + arg + "\": " + e);
+			channel.sendMessage("Error starting playlist: " + e);
 		});
 	}
 	if (msg.startsWith("!vol ")) {
 		let arg = msg.substring(5);
+		let target = getTarget();
 		if (arg > 0 && arg <= 100) {
 			let gain = arg / 100;
-			queue.setGain(gain);
+			target.setGain(gain);
 			console.info("[INFO] Set volume to " + gain);
 		}
 		else {
@@ -68,20 +121,19 @@ function onMessage(msg, user, connection) {
 		}
 	}
 	if (msg == "!pause") {
+		let target = getTarget();
 		console.info("[INFO] Paused.");
-		queue.pause();
-		channel.sendMessage("Paused.");
+		target.pause();
 	}
 	if (msg == "!resume") {
-		queue.resume();
+		let target = getTarget();
+		target.resume();
 		console.info("[INFO] Resumed.");
 	}
-
-	// Global commands
 	if (msg == "!debug") {
 		console.log(queue);
 	}
-	if (msg == "!help") {
+	if (msg == "!help") { // TODO: Update to include playlist mode
 		channel.sendMessage("Command list: <br>" +
 				"<ul>" +
 				"<li><span style='font-family: monospace'>!play [url]</span>: Adds the URL to the queue.</li>" +
@@ -92,6 +144,11 @@ function onMessage(msg, user, connection) {
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
 		"</ul>");
 	}
+}
+
+function getTarget() {
+	if (mode == Modes.QUEUE) return queue;
+	else if (mode == Modes.PLAYLIST) return playlist;
 }
 
 function connect() {

@@ -42,3 +42,32 @@ exports.download = function(url, filename) {
 		});
 	});
 }
+
+// Returns promise that resolves when the first 3 songs have been added or all of the songs have been added.
+exports.populateQueue = function(url) {
+	return new Promise((resolve, reject) => {
+		let playlist = [];
+		let proc = child_process.spawn("youtube-dl", ["-j", url]);
+		let resolved = false;
+		proc.stdout.on("data", (data) => {
+			try {
+				let video = JSON.parse(data);
+				playlist.push(video);
+				if (playlist.length == 3) {
+					resolved = true;
+					resolve(playlist);
+				}
+			}
+			catch {
+				reject("Error parsing playlist.");
+			}
+		});
+		proc.on("exit", (code) => {
+			if (code != 0) {
+				reject("Error parsing playlist (process failed)")
+			}
+			resolved = true;
+			resolve(playlist);
+		});
+	});
+}
