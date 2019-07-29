@@ -49,17 +49,6 @@ exports.populateQueue = function(url) {
 		let playlist = [];
 		let proc = child_process.spawn("youtube-dl", ["--flat-playlist", "-J", url]);
 		let data = ""
-//		proc.stdout.on("data", (data) => {
-//			try {
-//				let video = JSON.parse(data);
-//				console.log("data: " + data);
-//				playlist.push(video);
-//			}
-//			catch (e) {
-//				console.warn("[WARN] Error parsing playlist: " + e);
-//				reject("Error parsing playlist.");
-//			}
-//		});
 		proc.stdout.on("data", (d) => data += d);
 		proc.on("exit", (code) => {
 			if (code != 0) {
@@ -69,7 +58,8 @@ exports.populateQueue = function(url) {
 			// parse
 			try {
 				let res = JSON.parse(data);
-				resolve(res.entries);
+				if (!res.entries) reject("Not a playlist.");
+				else resolve(res.entries);
 			}
 			catch (e) {
 				reject("Error parsing playlist");

@@ -7,10 +7,11 @@ const songPlaceholder = {
 		title: "Loading..."
 }
 
-exports.startPlaylist = function(url, id, connection, config, callback) {
+exports.startPlaylist = function(url, id, connection, config, shuffle, callback) {
 	return new Promise((resolve, reject) => {
 		ytdl.populateQueue(url).then((queue) => {
 			let playlist = new Playlist(queue, url, id, connection, config, callback);
+			if (shuffle) playlist._shuffle();
 			// Download then play
 			playlist._download().then(() => playlist._nextSong());
 			// Now that the structure is constructed, resolve.
@@ -18,6 +19,16 @@ exports.startPlaylist = function(url, id, connection, config, callback) {
 		}).catch((e) => reject(e));
 	});
 }
+//
+//exports.shufflePlaylist = function(url, id, connection, config, callback) {
+//	return new Promise((resolve, reject) => {
+//		// Call above function and shuffle
+//		exports.startPlaylist(url, id, connection, config, callback).then((playlist) => {
+//			playlist._shuffle();
+//			resolve(playlist);
+//		}).catch((e) => reject(e));
+//	});
+//}
 
 function Playlist(queue, url, id, connection, config, callback) {
 	this.queue = queue;
@@ -25,11 +36,22 @@ function Playlist(queue, url, id, connection, config, callback) {
 	this.id = id;
 	this.player = new Player(connection);
 	this.callback = callback;
-	this.nowPlaying = null;
 	this.nextSong = null;
 	this.ready = false;
 	this.lastID = 0;
 	this.maxDuration = config.maxlength;
+}
+
+// Fisher–Yates Shuffle O(n)
+Playlist.prototype._shuffle = function() {
+	let back = this.queue.length;
+	while (back) {
+		let front = Math.floor(Math.random() * back--);
+		// swap front and back
+		let tmp = this.queue[back];
+		this.queue[back] = this.queue[front];
+		this.queue[front] = tmp;
+	}
 }
 
 Playlist.prototype._download = function() {
@@ -56,21 +78,26 @@ Playlist.prototype._download = function() {
 	});
 }
 
-// Gets next PLAYABLE song
-// Skips unplayable songs
+//Gets next PLAYABLE song
+//Skips unplayable songs
 Playlist.prototype._getNextSong = function() {
 	return new Promise((resolve, reject) => {
 		let next = this.queue.shift();
-		if (!next) reject();
+		if (!next) {
+			reject();
+			return;
+		}
+		console.debug("[DEBUG] Getting details for " + next.url);
 		ytdl.details(next.url).then((details) => {
 			if (details.duration > this.maxDuration) {
 				// try to call again if video is invalid
-				this._getNextSong();
+				this._getNextSong().catch((e) => reject(e));
 			}
-			resolve(details);
+			else resolve(details);
 		}).catch((e) => {
 			// If error, call again
-			this._getNextSong();
+			this._getNextSong().catch((e) => reject(e));
+			return;
 		});
 	});
 }

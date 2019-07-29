@@ -75,7 +75,7 @@ function onMessage(msg, user, connection) {
 			console.info("[INFO/Playlist] Skipping " + playlist.nowPlaying.title);
 			playlist.skip();
 		}
-		if (msg == "!queue") {
+		if (msg == "!queue" && playlist.isPlaying()) {
 			res = "Now playing: " + playlist.nowPlaying.title + "<br>";
 			if (playlist.nextSong)
 				res += "Next: " + playlist.nextSong.title;
@@ -93,7 +93,28 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, config, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, config, false, () => {
+			// shift modes back
+			mode = Modes.QUEUE;
+			playlist = undefined;
+			queue.resume();
+		}).then((pl) => {
+			playlist = pl;
+			// shift modes
+			mode = Modes.PLAYLIST;
+			queue.pause();
+		}).catch((e) => {
+			channel.sendMessage("Error starting playlist: " + e);
+		});
+	}
+	// FIXME: Do this without repetition
+	if (msg.startsWith("!shuffle ")) {
+		if (mode == Modes.PLAYLIST) return; // TODO: Make this behavior a little more user friendly
+		let arg = msg.substring(9);
+		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+		console.info("[INFO] Starting playlist " + url);
+		Playlist.startPlaylist(url, playlistID++, connection, config, true, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
