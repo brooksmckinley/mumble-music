@@ -47,27 +47,34 @@ exports.download = function(url, filename) {
 exports.populateQueue = function(url) {
 	return new Promise((resolve, reject) => {
 		let playlist = [];
-		let proc = child_process.spawn("youtube-dl", ["-j", url]);
-		let resolved = false;
-		proc.stdout.on("data", (data) => {
-			try {
-				let video = JSON.parse(data);
-				playlist.push(video);
-				if (playlist.length == 3) {
-					resolved = true;
-					resolve(playlist);
-				}
-			}
-			catch {
-				reject("Error parsing playlist.");
-			}
-		});
+		let proc = child_process.spawn("youtube-dl", ["--flat-playlist", "-J", url]);
+		let data = ""
+//		proc.stdout.on("data", (data) => {
+//			try {
+//				let video = JSON.parse(data);
+//				console.log("data: " + data);
+//				playlist.push(video);
+//			}
+//			catch (e) {
+//				console.warn("[WARN] Error parsing playlist: " + e);
+//				reject("Error parsing playlist.");
+//			}
+//		});
+		proc.stdout.on("data", (d) => data += d);
 		proc.on("exit", (code) => {
 			if (code != 0) {
+				console.warn("[WARN] Error processing playlist (process failed)");
 				reject("Error parsing playlist (process failed)")
 			}
-			resolved = true;
-			resolve(playlist);
+			// parse
+			try {
+				let res = JSON.parse(data);
+				resolve(res.entries);
+			}
+			catch (e) {
+				reject("Error parsing playlist");
+				console.warn("[WARN] Error processing playlist: " + e);
+			}
 		});
 	});
 }

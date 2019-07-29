@@ -93,7 +93,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, config, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;

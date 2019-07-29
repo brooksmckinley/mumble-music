@@ -1,12 +1,16 @@
 var Player = require("./Player.js"),
-	ytdl = require("./ytdl.js");
+ytdl = require("./ytdl.js");
 
 var fs = require("fs");
 
-exports.startPlaylist = function(url, id, connection, callback) {
+const songPlaceholder = {
+		title: "Loading..."
+}
+
+exports.startPlaylist = function(url, id, connection, config, callback) {
 	return new Promise((resolve, reject) => {
 		ytdl.populateQueue(url).then((queue) => {
-			let playlist = new Playlist(queue, url, id, connection, callback);
+			let playlist = new Playlist(queue, url, id, connection, config, callback);
 			// Download then play
 			playlist._download().then(() => playlist._nextSong());
 			// Now that the structure is constructed, resolve.
@@ -15,7 +19,7 @@ exports.startPlaylist = function(url, id, connection, callback) {
 	});
 }
 
-function Playlist(queue, url, id, connection, callback) {
+function Playlist(queue, url, id, connection, config, callback) {
 	this.queue = queue;
 	this.url = url;
 	this.id = id;
@@ -25,16 +29,48 @@ function Playlist(queue, url, id, connection, callback) {
 	this.nextSong = null;
 	this.ready = false;
 	this.lastID = 0;
+	this.maxDuration = config.maxlength;
 }
 
 Playlist.prototype._download = function() {
 	return new Promise((resolve, reject) => {
-		this.nextSong = this.queue.shift();
 		this.ready = false;
-		this.nextSong.filename = ".tmp.playlist." + this.id + "." + this.lastID++ + ".wav";
-		ytdl.download(this.nextSong.webpage_url, this.nextSong.filename).then(() => {
-			this.ready = true;
-			if (!this.isPlaying()) resolve(); // Only resolve if not playing. If it's playing, the next song will automatically be played
+		this.nextSong = songPlaceholder;
+		this._getNextSong().then((song) => {
+			this.nextSong = song;
+			this.nextSong.filename = ".tmp.playlist." + this.id + "." + this.lastID++ + ".wav";
+			ytdl.download(this.nextSong.webpage_url, this.nextSong.filename).then(() => {
+				this.ready = true;
+				if (!this.isPlaying()) resolve(); // Only resolve if not playing. If it's playing, the next song will automatically be played
+			});
+		}).catch((e) => {
+			if (!e) {
+				// Song is not found, so mark nextSong as undefined and return silently
+				this.nextSong = undefined;
+				if (!this.isPlaying()) resolve(); // same as above
+			}
+			else {
+				reject(e);
+			}
+		});
+	});
+}
+
+// Gets next PLAYABLE song
+// Skips unplayable songs
+Playlist.prototype._getNextSong = function() {
+	return new Promise((resolve, reject) => {
+		let next = this.queue.shift();
+		if (!next) reject();
+		ytdl.details(next.url).then((details) => {
+			if (details.duration > this.maxDuration) {
+				// try to call again if video is invalid
+				this._getNextSong();
+			}
+			resolve(details);
+		}).catch((e) => {
+			// If error, call again
+			this._getNextSong();
 		});
 	});
 }
@@ -73,7 +109,7 @@ Playlist.prototype.stop = function() {
 	this.callback();
 }
 
-// Exposing data structures of the player
+//Exposing data structures of the player
 
 Playlist.prototype.isPlaying = function() {
 	if (!this.player) return false;
@@ -85,7 +121,7 @@ Playlist.prototype.isPaused = function() {
 	return this.player.isPaused;
 }
 
-// Exposing functions of the player
+//Exposing functions of the player
 
 Playlist.prototype.skip = function() {
 	if (this.player) {
