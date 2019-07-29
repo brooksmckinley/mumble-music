@@ -8,7 +8,8 @@ exports.details = function(url) {
 		let proc = child_process.spawn("youtube-dl", ["-j", "--no-playlist", "--playlist-items", "1", url]);
 		let data = "";
 		proc.stdout.on("data", (d) => data += d.toString());
-		proc.stdout.on("end", () => {
+		proc.on("exit", (code) => {
+			if (code != 0) reject("Error getting video information.");
 			try {
 				resolve(JSON.parse(data));
 			} catch {
