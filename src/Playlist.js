@@ -91,12 +91,13 @@ Playlist.prototype._getNextSong = function() {
 		ytdl.details(next.url).then((details) => {
 			if (details.duration > this.maxDuration) {
 				// try to call again if video is invalid
-				this._getNextSong().catch((e) => reject(e));
+				this._getNextSong().then(resolve).catch((e) => reject(e));
 			}
 			else resolve(details);
 		}).catch((e) => {
 			// If error, call again
-			this._getNextSong().catch((e) => reject(e));
+			console.warn("[ERROR] Error getting details: " + e);
+			this._getNextSong().then(resolve).catch((e) => reject(e));
 			return;
 		});
 	});
