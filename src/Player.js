@@ -18,13 +18,15 @@ Player.prototype._fillBuf = function() {
 	if (this.isPlaying) {
 		fs.read(this.fd, this.buf, 0, 48000, null, (err, bytesRead, buffer) => {
 			if (err) throw err;
-			this.stream.write(buffer);
 			if (bytesRead == 0) {
 				console.info("[INFO] Song timeout.");
 				this.isPlaying = false;
 				this._delete();
 				// Sleep for half a second so stream drains out fully before resolving
 				setTimeout(this.promise.resolve, 500);
+			}
+			else {
+				this.stream.write(buffer);
 			}
 		});
 	}
