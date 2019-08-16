@@ -69,8 +69,9 @@ function onMessage(msg, user, connection) {
 	}
 	
 	// Playlist mode commands
-	// TODO: user friendly rejections if someone tries to use a queue command in playlist mode
 	if (mode == Modes.PLAYLIST) {
+		if (msg.startsWith("!play " || msg.startsWith("!search ")))
+			channel.sendMessage("Error: Bot is in playlist mode. Type !stop to return the bot to queue mode.");
 		if (msg == "!skip" && playlist.isPlaying()) {
 			console.info("[INFO/Playlist] Skipping " + playlist.nowPlaying.title);
 			playlist.skip();
@@ -88,7 +89,9 @@ function onMessage(msg, user, connection) {
 
 	// Global commands
 	if (msg.startsWith("!playlist ")) {
-		if (mode == Modes.PLAYLIST) return; // TODO: Make this behavior a little more user friendly
+		if (mode == Modes.PLAYLIST) {
+			channel.sendMessage("Already playing a playlist!");
+		}
 		let arg = msg.substring(10);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
@@ -109,7 +112,10 @@ function onMessage(msg, user, connection) {
 	}
 	// FIXME: Do this without repetition
 	if (msg.startsWith("!shuffle ")) {
-		if (mode == Modes.PLAYLIST) return; // TODO: Make this behavior a little more user friendly
+		if (mode == Modes.PLAYLIST) {
+			channel.sendMessage("Already playing a playlist!");
+			return;
+		}
 		let arg = msg.substring(9);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
@@ -154,7 +160,7 @@ function onMessage(msg, user, connection) {
 	if (msg == "!debug") {
 		console.log(queue);
 	}
-	if (msg == "!help") { // TODO: Update to include playlist mode
+	if (msg == "!help") { 
 		channel.sendMessage("Command list: <br>" +
 				"<ul>" +
 				"<li><span style='font-family: monospace'>!play [url]</span>: Adds the URL to the queue.</li>" +
