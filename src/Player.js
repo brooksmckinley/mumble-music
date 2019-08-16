@@ -26,7 +26,7 @@ Player.prototype._fillBuf = function() {
 				setTimeout(this.promise.resolve, 500);
 			}
 			else {
-				this.stream.write(buffer);
+				this.stream.write(buffer.slice(0, bytesRead));
 			}
 		});
 	}
