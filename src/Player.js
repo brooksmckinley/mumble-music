@@ -27,6 +27,7 @@ Player.prototype._fillBuf = function() {
 			}
 			else {
 				this.stream.write(buffer.slice(0, bytesRead));
+				if (bytesRead < 48000) this._fillBuf(); // Refill buffer one last time in case drain event isn't called
 			}
 		});
 	}
