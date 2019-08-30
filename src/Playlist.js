@@ -64,6 +64,10 @@ Playlist.prototype._download = function() {
 			ytdl.download(this.nextSong.webpage_url, this.nextSong.filename).then(() => {
 				this.ready = true;
 				if (!this.isPlaying()) resolve(); // Only resolve if not playing. If it's playing, the next song will automatically be played
+			}).catch((e) => {
+				// skip song
+				console.warn("[WARN] Error downloading link: " + e);
+				this._nextSong();
 			});
 		}).catch((e) => {
 			if (!e) {
