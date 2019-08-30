@@ -128,7 +128,7 @@ Playlist.prototype.stop = function() {
 	this.player.stop();
 	// attempt to delete next song, if it fails try again when it finishes.
 	try {
-		fs.unlinkSync(this.nextSong.filename);
+		if (this.nextSong) fs.unlinkSync(this.nextSong.filename);
 	}
 	catch (e) {
 		console.warn("[WARN] Unlink failed: " + e);
