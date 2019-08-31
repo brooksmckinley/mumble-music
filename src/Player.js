@@ -34,8 +34,11 @@ Player.prototype._fillBuf = function() {
 }
 
 Player.prototype._delete = function() {
-	fs.closeSync(this.fd);
-	fs.unlinkSync(this.filename);
+	try {
+		fs.closeSync(this.fd);
+		fs.unlinkSync(this.filename);
+	}
+	catch (e) {}
 }
 
 Player.prototype.setGain = function(gain) {
