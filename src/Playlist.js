@@ -67,7 +67,7 @@ Playlist.prototype._download = function() {
 			}).catch((e) => {
 				// skip song
 				console.warn("[WARN] Error downloading link: " + e);
-				this._nextSong();
+				this._download().then(resolve).catch(reject);
 			});
 		}).catch((e) => {
 			if (!e) {
