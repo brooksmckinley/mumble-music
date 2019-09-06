@@ -38,20 +38,16 @@ SongQueue.prototype.addSong = function(url) {
 	});
 }
 
-SongQueue.prototype.start = function(connection) {
+SongQueue.prototype.start = async function(connection) {
 	if (!this.player) {
 		this.player = new Player(connection);
 	}
 	if (!this.player.isPlaying) {
-		this._nextSong();
+		for (let song = this.queue.shift(); song != undefined; song = this.queue.shift()) {
+			this.nowPlaying = song;
+			await this.player.playFile(".tmp." + song.id + ".wav");
+		}
 	}
-}
-
-SongQueue.prototype._nextSong = function() {
-	if (this.queue.length == 0) return;
-	let song = this.queue.shift();
-	this.nowPlaying = song;
-	this.player.playFile(".tmp." + song.id + ".wav").then(() => this._nextSong());
 }
 
 SongQueue.prototype.getQueue = function() {
@@ -67,7 +63,6 @@ SongQueue.prototype.getQueue = function() {
 SongQueue.prototype.skip = function() {
 	if (this.player) {
 		this.player.stop();
-		this._nextSong();
 	}
 }
 
