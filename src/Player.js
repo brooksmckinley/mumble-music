@@ -68,7 +68,7 @@ Player.prototype.stop = function() {
 	this.isPlaying = false;
 	let promise = this.promise;
 	this.promise = undefined;
-	this.promise.resolve();
+	promise.resolve();
 }
 
 Player.prototype.pause = function() {
