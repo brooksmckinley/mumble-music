@@ -7,28 +7,13 @@ const songPlaceholder = {
 		title: "Loading..."
 }
 
-exports.startPlaylist = function(url, id, connection, config, shuffle, callback) {
-	return new Promise((resolve, reject) => {
-		ytdl.populateQueue(url).then((queue) => {
-			let playlist = new Playlist(queue, url, id, connection, config, callback);
-			if (shuffle) playlist._shuffle();
-			// Download then play
-			playlist._download().then(() => playlist._nextSong());
-			// Now that the structure is constructed, resolve.
-			resolve(playlist);
-		}).catch((e) => reject(e));
-	});
+exports.startPlaylist = async function(url, id, connection, config, shuffle, callback) {
+	let queue = await ytdl.populateQueue(url);
+	let playlist = new Playlist(queue, url, id, connection, config, callback);
+	if (shuffle) playlist._shuffle();
+	playlist._download().then(() => playlist._nextSong());
+	return playlist;
 }
-//
-//exports.shufflePlaylist = function(url, id, connection, config, callback) {
-//	return new Promise((resolve, reject) => {
-//		// Call above function and shuffle
-//		exports.startPlaylist(url, id, connection, config, callback).then((playlist) => {
-//			playlist._shuffle();
-//			resolve(playlist);
-//		}).catch((e) => reject(e));
-//	});
-//}
 
 function Playlist(queue, url, id, connection, config, callback) {
 	this.queue = queue;
