@@ -66,6 +66,9 @@ Player.prototype.stop = function() {
 	this.stream.close();
 	this._createStream();
 	this.isPlaying = false;
+	let promise = this.promise;
+	this.promise = undefined;
+	this.promise.resolve();
 }
 
 Player.prototype.pause = function() {
