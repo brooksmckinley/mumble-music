@@ -21,21 +21,16 @@ SongQueue.prototype.isPaused = function() {
 	return this.player.isPaused;
 }
 
-SongQueue.prototype.addSong = function(url) {
-	return new Promise((resolve, reject) => {
-		ytdl.details(url).then((details) => {
-			if (details.duration > this.maxDuration) {
-				reject("video too long");
-				return;
-			}
-			let id = this.lastID++;
-			let p = ytdl.download(url, ".tmp." + id + ".wav").then(() => {
-				let song = new Song(details.title, details.duration, id);
-				this.queue.push(song);
-				resolve(song);
-			}).catch((e) => reject(e));
-		}).catch((e) => reject(e));
-	});
+SongQueue.prototype.addSong = async function(url) {
+	let details = await ytdl.details(url);
+	if (details.duration > this.maxDuration) {
+		throw "video too long";
+	}
+	let id = this.lastID++;
+	await ytdl.download(url, ".tmp." + id + ".wav");
+	let song = new Song(details.title, details.duration, id)
+	this.queue.push(song);
+	return song;
 }
 
 SongQueue.prototype.start = async function(connection) {
