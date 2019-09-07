@@ -44,7 +44,7 @@ function onMessage(msg, user, connection) {
 				queue.skip();
 			}
 		}
-		if (msg == "!queue") {
+		if (msg == "!queue" || msg == "!q") {
 			let msg = "";
 			if (queue.isPlaying()) 
 				msg += "Now playing: " + queue.nowPlaying.name + "<br>";
@@ -76,7 +76,7 @@ function onMessage(msg, user, connection) {
 			console.info("[INFO/Playlist] Skipping " + playlist.nowPlaying.title);
 			playlist.skip();
 		}
-		if (msg == "!queue" && playlist.isPlaying()) {
+		if ((msg == "!queue" || msg == "!q") && playlist.isPlaying()) {
 			res = "Now playing: " + playlist.nowPlaying.title + "<br>";
 			if (playlist.nextSong)
 				res += "Next: " + playlist.nextSong.title;
