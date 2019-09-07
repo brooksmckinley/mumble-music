@@ -13,8 +13,8 @@ exports.startPlaylist = async function(url, id, connection, channel, config, shu
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
 	playlist._start().catch((e) => {
-		throw e;
 		callback();
+		throw e;
 	}); // callback if fail
 	return playlist;
 }
