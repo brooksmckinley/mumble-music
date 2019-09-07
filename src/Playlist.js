@@ -106,7 +106,7 @@ Playlist.prototype._getNextSong = async function() {
 		return;
 	}
 	// Set URL
-	if (youtube) next.url = "https://youtu.be/" + next.url;
+	if (this.youtube) next.url = "https://youtu.be/" + next.url;
 	console.debug("[DEBUG] Getting details for " + next.url);
 	try {
 		let details = await ytdl.details(next.url);
