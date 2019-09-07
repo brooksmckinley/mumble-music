@@ -61,7 +61,8 @@ Playlist.prototype._start = async function() {
 			nextSong.then((res) => { 
 				if (!res) return;
 				this.nextSong = res;
-				nextFile = ytdl.download(res.webpage_url, res.filename).catch(() => {
+				nextFile = ytdl.download(res.webpage_url, res.filename); // Seperate lines to preserve isRunning()
+				nextFile.catch(() => {
 					console.warn("[WARN] Error downloading link: " + e);
 					gn();
 				}); // call again if error
