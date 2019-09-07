@@ -12,7 +12,10 @@ exports.startPlaylist = async function(url, id, connection, channel, config, shu
 	let playlist = new Playlist(queue, url, id, connection, config, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
-	playlist._start().catch(callback); // callback if fail
+	playlist._start().catch((e) => {
+		throw e;
+		callback();
+	}); // callback if fail
 	return playlist;
 }
 
