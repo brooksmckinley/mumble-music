@@ -19,6 +19,8 @@ exports.startPlaylist = async function(url, id, connection, channel, config, shu
 function Playlist(queue, url, id, connection, channel, config, callback) {
 	this.queue = queue;
 	this.url = url;
+	if (this.url.contains("youtube\.com")) this.youtube = true;
+	else this.youtube = false;
 	this.id = id;
 	this.player = new Player(connection);
 	this.channel = channel;
@@ -100,6 +102,8 @@ Playlist.prototype._getNextSong = async function() {
 	if (!next) {
 		return;
 	}
+	// Set URL
+	if (youtube) next.url = "https://youtu.be/" + next.url;
 	console.debug("[DEBUG] Getting details for " + next.url);
 	try {
 		let details = await ytdl.details(next.url);
