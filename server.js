@@ -100,11 +100,13 @@ function onMessage(msg, user, connection) {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
+			console.debug("[DEBUG] Playlist stopped.");
 			queue.resume();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
 			mode = Modes.PLAYLIST;
+			console.debug("[DEBUG] Playlist started.");
 			queue.pause();
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
@@ -119,16 +121,18 @@ function onMessage(msg, user, connection) {
 		let arg = msg.substring(9);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-		console.info("[INFO] Starting playlist " + url);
+		console.info("[INFO] Shuffling playlist " + url);
 		Playlist.startPlaylist(url, playlistID++, connection, config, true, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
+			console.debug("[DEBUG] Playlist stopped.");
 			queue.resume();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
 			mode = Modes.PLAYLIST;
+			console.debug("[DEBUG] Playlist started.");
 			queue.pause();
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
