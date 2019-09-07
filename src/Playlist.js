@@ -11,7 +11,8 @@ exports.startPlaylist = async function(url, id, connection, config, shuffle, cal
 	let queue = await ytdl.populateQueue(url);
 	let playlist = new Playlist(queue, url, id, connection, config, callback);
 	if (shuffle) playlist._shuffle();
-	playlist._download().then(() => playlist._nextSong());
+	//playlist._download().then(() => playlist._nextSong());
+	playlist._start();
 	return playlist;
 }
 
@@ -39,91 +40,88 @@ Playlist.prototype._shuffle = function() {
 	}
 }
 
-Playlist.prototype._download = function() {
-	return new Promise((resolve, reject) => {
-		this.ready = false;
-		this.nextSong = songPlaceholder;
-		this._getNextSong().then((song) => {
-			this.nextSong = song;
-			this.nextSong.filename = ".tmp.playlist." + this.id + "." + this.lastID++ + ".wav";
-			ytdl.download(this.nextSong.webpage_url, this.nextSong.filename).then(() => {
-				this.ready = true;
-				if (!this.isPlaying()) resolve(); // Only resolve if not playing. If it's playing, the next song will automatically be played
-			}).catch((e) => {
-				// skip song
-				console.warn("[WARN] Error downloading link: " + e);
-				this._download().then(resolve).catch(reject);
+Playlist.prototype._start = async function() {
+	let song = await this._getNextSong();
+	let file = ytdl.download(song.webpage_url, song.filename);
+	while (song != undefined) {
+		// Prepare song for playing
+		this.nowPlaying = song;
+		let nextSong, nextFile;
+		let gn = () => { 
+			this.nextSong = songPlaceholder;
+			nextSong = this._getNextSong(); // Start getting next song immediately
+			nextSong.then((res) => { 
+				if (!res) return;
+				this.nextSong = res;
+				nextFile = ytdl.download(res.webpage_url, res.filename).catch(() => {
+					console.warn("[WARN] Error downloading link: " + e);
+					gn();
+				}); // call again if error
 			});
-		}).catch((e) => {
-			if (!e) {
-				// Song is not found, so mark nextSong as undefined and return silently
-				this.nextSong = undefined;
-				if (!this.isPlaying()) resolve(); // same as above
-			}
-			else {
-				reject(e);
-			}
-		});
-	});
+		};
+		gn();
+		try {
+			await file;
+		}
+		catch (e) {
+			console.warn("[WARN] Error downloading link: " + e);
+			song = await nextSong; // Skip song
+			file = nextFile; // nextFile set when nextSong resolves
+			continue;
+		}
+		if (this.isStopped) { // Clean up if someone stopped before the download finished
+			fs.unlinkSync(song.filename);
+			let ns = await nextSong;
+			await nextFile; // wait for download
+			if (ns) fs.unlinkSync(ns.filename);
+			return; 
+		}
+		await this.player.playFile(song.filename);
+		if (this.isStopped) { // Return if someone stopped during the playlist
+			let ns = await nextSong;
+			await nextFile;
+			if (ns) fs.unlinkSync(ns.filename);
+			return;
+		}
+		song = await nextSong;
+		file = nextFile;
+	}
+	this.callback();
 }
 
 //Gets next PLAYABLE song
 //Skips unplayable songs
-Playlist.prototype._getNextSong = function() {
-	return new Promise((resolve, reject) => {
-		let next = this.queue.shift();
-		if (!next) {
-			reject();
-			return;
+Playlist.prototype._getNextSong = async function() {
+	let next = this.queue.shift();
+	if (!next) {
+		return;
+	}
+	console.debug("[DEBUG] Getting details for " + next.url);
+	try {
+		let details = await ytdl.details(next.url);
+		if (details.duration > this.maxDuration) {
+			return this._getNextSong(); // call again if unplayable
 		}
-		console.debug("[DEBUG] Getting details for " + next.url);
-		ytdl.details(next.url).then((details) => {
-			if (details.duration > this.maxDuration) {
-				// try to call again if video is invalid
-				this._getNextSong().then(resolve).catch((e) => reject(e));
-			}
-			else resolve(details);
-		}).catch((e) => {
-			// If error, call again
-			console.warn("[ERROR] Error getting details: " + e);
-			this._getNextSong().then(resolve).catch((e) => reject(e));
-			return;
-		});
-	});
-}
+		// Set filename
+		details.filename = ".tmp.playlist." + this.id + "." + this.lastID++ + ".wav";
+		return details;
 
-Playlist.prototype._nextSong = function() {
-	// Delete the next song if the bot is stopped
-	if (this.isStopped) {
-		try {
-			fs.unlinkSync(this.nextSong.filename);
-		}
-		catch (e) {} // fail silently
-		return;
 	}
-	if (this.nextSong == undefined) {
-		this.callback();
-		return;
+	catch (e) {
+		console.warn("[ERROR] Error getting details: " + e);
+		return this._getNextSong(); // call again if error
 	}
-	if (this.ready) {
-		this.nowPlaying = this.nextSong;
-		this.player.playFile(this.nowPlaying.filename).then(() => this._nextSong());
-		// Download the next song
-		this._download().then(() => this._nextSong());
-	}
+	
 }
 
 Playlist.prototype.stop = function() {
 	this.player.stop();
-	// attempt to delete next song, if it fails try again when it finishes.
-	try {
-		if (this.nextSong) fs.unlinkSync(this.nextSong.filename);
-	}
-	catch (e) {
-		console.warn("[WARN] Unlink failed: " + e);
-	} // fail silently
 	this.isStopped = true;
 	this.callback();
+}
+
+Playlist.prototype.skip = function() {
+	this.player.stop();
 }
 
 //Exposing data structures of the player
@@ -139,13 +137,6 @@ Playlist.prototype.isPaused = function() {
 }
 
 //Exposing functions of the player
-
-Playlist.prototype.skip = function() {
-	if (this.player) {
-		this.player.stop();
-		this._nextSong();
-	}
-}
 
 Playlist.prototype.pause = function() {
 	if (this.player) {
