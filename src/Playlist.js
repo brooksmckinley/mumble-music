@@ -7,20 +7,21 @@ const songPlaceholder = {
 		title: "Loading..."
 }
 
-exports.startPlaylist = async function(url, id, connection, config, shuffle, callback) {
+exports.startPlaylist = async function(url, id, connection, channel, config, shuffle, callback) {
 	let queue = await ytdl.populateQueue(url);
 	let playlist = new Playlist(queue, url, id, connection, config, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
-	playlist._start();
+	playlist._start().catch(callback); // callback if fail
 	return playlist;
 }
 
-function Playlist(queue, url, id, connection, config, callback) {
+function Playlist(queue, url, id, connection, channel, config, callback) {
 	this.queue = queue;
 	this.url = url;
 	this.id = id;
 	this.player = new Player(connection);
+	this.channel = channel;
 	this.callback = callback;
 	this.nextSong = null;
 	this.ready = false;
@@ -61,6 +62,9 @@ Playlist.prototype._start = async function() {
 		};
 		gn();
 		try {
+			if (file.isRunning()) {
+				this.channel.sendMessage("Downloading song...");
+			}
 			await file;
 		}
 		catch (e) {

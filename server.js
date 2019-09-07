@@ -19,7 +19,6 @@ var playlist;
 var playlistID = 0; // ID for playlist temp files to prevent collisions
 var channel = undefined;
 
-
 function onMessage(msg, user, connection) {
 	// Queue mode commands
 	if (mode == Modes.QUEUE) {
@@ -96,7 +95,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, config, false, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, config, false, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
@@ -122,7 +121,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Shuffling playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, config, true, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, config, true, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
