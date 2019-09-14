@@ -26,6 +26,7 @@ Player.prototype._fillBuf = function() {
 				setTimeout(this.promise.resolve, 500);
 			}
 			else {
+				this.currentPos += 1; // num of bufs filled
 				this.stream.write(buffer.slice(0, bytesRead));
 				if (bytesRead < 48000) this._fillBuf(); // Refill buffer one last time in case drain event isn't called
 			}
@@ -55,10 +56,16 @@ Player.prototype.playFile = function(filename) {
 			};
 			this.filename = filename;
 			this.isPlaying = true;
+			this.currentPos = 0;
 			this.fd = fs.openSync(filename, 'r', 666);
 			this._fillBuf();
 		});
 	}
+}
+
+Player.prototype.getCurrentPos = function() {
+	if (this.isPlaying) return Math.floor(this.currentPos / 2); // gets position in seconds
+	else return 0;
 }
 
 Player.prototype.stop = function() {

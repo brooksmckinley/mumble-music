@@ -53,6 +53,10 @@ SongQueue.prototype.getQueue = function() {
 	return res;
 }
 
+SongQueue.prototype.getCurrentDuration = function() {
+	if (this.isPlaying()) return hhmmss.fromS(this.nowPlaying.duration);
+}
+
 SongQueue.prototype.getQueueLength = function() {
 	let duration = 0;
 	for (let song of this.queue) {
@@ -90,6 +94,12 @@ SongQueue.prototype.setGain = function(gain) {
 SongQueue.prototype.getGain = function() {
 	if (this.player) {
 		return this.player.gain;
+	}
+}
+
+SongQueue.prototype.getCurrentPos = function() {
+	if (this.player) {
+		return hhmmss.fromS(this.player.getCurrentPos());
 	}
 }
 

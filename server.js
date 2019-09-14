@@ -46,7 +46,7 @@ function onMessage(msg, user, connection) {
 		if (msg == "!queue" || msg == "!q") {
 			let msg = "";
 			if (queue.isPlaying()) 
-				msg += "Now playing: " + queue.nowPlaying.name + "<br>";
+				msg += "Now playing: " + queue.nowPlaying.name + " (" + queue.getCurrentPos() + "/" + queue.getCurrentDuration() + ")" + "<br>";
 			msg += "<b>Current queue: " + queue.getQueueLength() + "</b><br>" 
 			msg += queue.getQueue().replace(/\n/g, "<br>");
 			channel.sendMessage(msg);
