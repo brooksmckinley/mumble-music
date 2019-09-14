@@ -50,7 +50,7 @@ Playlist.prototype._shuffle = function() {
 
 Playlist.prototype._start = async function() {
 	let song = await this._getNextSong();
-	let file = ytdl.download(song.webpage_url, song.filename); // FIXME: what if this fails?
+	let file = ytdl.download(song.webpage_url, song.filename);
 	while (song != undefined) {
 		// Prepare song for playing
 		this.nowPlaying = song;
