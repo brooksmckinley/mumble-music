@@ -48,9 +48,17 @@ SongQueue.prototype.start = async function(connection) {
 SongQueue.prototype.getQueue = function() {
 	res = "";
 	for (let song of this.queue) {
-		res += song.name + ": " + hhmmss.fromS(song.duration) + "\n";
+		res += `[${hhmmss.fromS(song.duration)}] ${song.name}`;
 	}
 	return res;
+}
+
+SongQueue.prototype.getQueueLength = function() {
+	let duration = 0;
+	for (let song of this.queue) {
+		duration += song.duration;
+	}
+	return hhmmss.fromS(duration);
 }
 
 // Exposing functions of the player

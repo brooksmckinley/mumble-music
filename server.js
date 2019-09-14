@@ -47,7 +47,8 @@ function onMessage(msg, user, connection) {
 			let msg = "";
 			if (queue.isPlaying()) 
 				msg += "Now playing: " + queue.nowPlaying.name + "<br>";
-			msg += "Current queue: <br>" + queue.getQueue().replace(/\n/g, "<br>");
+			msg += "<b>Current queue: " + queue.getQueueLength() + "</b><br>" 
+			msg += queue.getQueue().replace(/\n/g, "<br>");
 			channel.sendMessage(msg);
 		}
 		if (msg.startsWith("!search ")) {
