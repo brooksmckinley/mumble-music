@@ -69,7 +69,7 @@ function onMessage(msg, user, connection) {
 	
 	// Playlist mode commands
 	if (mode == Modes.PLAYLIST) {
-		if (msg.startsWith("!play " || msg.startsWith("!search ")))
+		if (msg.startsWith("!play ") || msg.startsWith("!search "))
 			channel.sendMessage("Error: Bot is in playlist mode. Type !stop to return the bot to queue mode.");
 		if (msg == "!skip" && playlist.isPlaying()) {
 			console.info("[INFO/Playlist] Skipping " + playlist.nowPlaying.title);
@@ -148,6 +148,12 @@ function onMessage(msg, user, connection) {
 		else {
 			console.warn("[WARN] Invalid volume: " + arg);
 			channel.sendMessage("Invalid volume. Please only use a volume from 1 to 100.");
+		}
+	}
+	if (msg == "!vol") {
+		let gain = getTarget().getGain();
+		if (gain) {
+			channel.sendMessage("Current volume: " + gain * 100 + "%");
 		}
 	}
 	if (msg == "!pause") {

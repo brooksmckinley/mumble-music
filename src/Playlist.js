@@ -169,3 +169,9 @@ Playlist.prototype.setGain = function(gain) {
 		this.player.setGain(gain);
 	}
 }
+
+Playlist.prototype.getGain = function() {
+	if (this.player) {
+		return this.player.gain;
+	}
+}

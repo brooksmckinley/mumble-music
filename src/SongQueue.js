@@ -79,6 +79,12 @@ SongQueue.prototype.setGain = function(gain) {
 	}
 }
 
+SongQueue.prototype.getGain = function() {
+	if (this.player) {
+		return this.player.gain;
+	}
+}
+
 function Song(name, duration, id) {
 	this.name = name;
 	this.duration = duration;
