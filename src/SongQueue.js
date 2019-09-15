@@ -48,7 +48,7 @@ SongQueue.prototype.start = async function(connection) {
 SongQueue.prototype.getQueue = function() {
 	res = "";
 	for (let song of this.queue) {
-		res += `[${hhmmss.fromS(song.duration)}] ${song.name}`;
+		res += `[${hhmmss.fromS(song.duration)}] ${song.name}\n`;
 	}
 	return res;
 }
