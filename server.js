@@ -139,15 +139,14 @@ function onMessage(msg, user, connection) {
 		});
 	}
 	if (msg.startsWith("!vol ")) {
-		let arg = msg.substring(5);
+		let gain = msg.substring(5) / 100;
 		let target = getTarget();
-		if (arg > 0 && arg <= 100) {
-			let gain = arg / 100;
+		if (gain > 0 && gain <= 1) {
 			target.setGain(gain);
 			console.info("[INFO] Set volume to " + gain);
 		}
 		else {
-			console.warn("[WARN] Invalid volume: " + arg);
+			console.warn("[WARN] Invalid volume: " + gain);
 			channel.sendMessage("Invalid volume. Please only use a volume from 1 to 100.");
 		}
 	}
