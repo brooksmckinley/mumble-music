@@ -4,5 +4,7 @@
     "bitrate": null,
     "maxlength": 900,
     "name": "nodejs",
-    "channel": "root"
+    "channel": "root",
+    "privkey": null,
+    "cert": null
 }

@@ -193,7 +193,11 @@ function getTarget() {
 }
 
 function connect() {
-	mumble.connect(config.server, null, (e, connection) => {
+	let options = {
+		key: fs.readFileSync(config.privkey),
+		cert: fs.readFileSync(config.cert)
+	};
+	mumble.connect(config.server, options, (e, connection) => {
 		if (e) {
 			console.error("[ERR] Unable to connect to the mumble server.");
 			throw e;
