@@ -193,7 +193,8 @@ function getTarget() {
 }
 
 function connect() {
-	let options = {
+	let options = null;
+	if (config.privkey && config.cert) options = {
 		key: fs.readFileSync(config.privkey),
 		cert: fs.readFileSync(config.cert)
 	};
