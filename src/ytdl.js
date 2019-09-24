@@ -58,28 +58,29 @@ exports.download = function(url, filename) {
 	return res;
 }
 
-exports.fetch = async function(url, filename) {
-	let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "-o", filename];
-	// Only download the audio if it's on YouTube
-	if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
-		args.push("-f");
-		args.push("bestaudio");
-	} 
-	args.push(url);
-	console.debug("[INFO] Fetching " + url);
-	let proc = child_process.spawn("youtube-dl", args);
-	proc.on("exit", (code) => {
-		if (code == 0) {
-			return;
-		}
-		else {
-			running = false;
-			throw "Error downloading link.";
-		}
-	});
-	proc.on("error", (e) => {
-		throw "Error downloading link.";
-		console.log(e)
+exports.fetch = function(url, filename) {
+	return new Promise((resolve, reject) => {
+		let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "-o", filename];
+		// Only download the audio if it's on YouTube
+		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
+			args.push("-f");
+			args.push("bestaudio");
+		} 
+		args.push(url);
+		console.debug("[INFO] Fetching " + url);
+		let proc = child_process.spawn("youtube-dl", args);
+		proc.on("exit", (code) => {
+			if (code == 0) {
+				resolve();
+			}
+			else {
+				reject("Error downloading link.");
+			}
+		});
+		proc.on("error", (e) => {
+			reject("Error downloading link.");
+			console.log(e)
+		});
 	});
 }
 
