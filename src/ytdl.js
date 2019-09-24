@@ -59,7 +59,7 @@ exports.download = function(url, filename) {
 }
 
 exports.fetch = async function(url, filename) {
-	let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "-o", filename];
+	let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "-o", filename];
 	// Only download the audio if it's on YouTube
 	if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
 		args.push("-f");
