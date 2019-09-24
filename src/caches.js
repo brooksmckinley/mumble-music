@@ -19,7 +19,7 @@ exports.cleanup = async function() {
 exports.pull = async function(url) {
 	let filename = getFilename(url);
 	try {
-		await fs.promises.stat(filename); // if this fails the catch block goes
+		await fs.statSync(filename); // if this fails the catch block goes
 		return filename;
 	}
 	catch {
