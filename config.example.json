@@ -5,6 +5,7 @@
     "maxlength": 900,
     "name": "nodejs",
     "channel": "root",
+    "cache": 2592000,
     "privkey": null,
     "cert": null
 }

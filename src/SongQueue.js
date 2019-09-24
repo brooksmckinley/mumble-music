@@ -27,7 +27,7 @@ SongQueue.prototype.addSong = async function(url) {
 		throw "video too long";
 	}
 	let id = this.lastID++;
-	await ytdl.download(url, ".tmp." + id + ".wav");
+	await ytdl.download(details.webpage_url, ".tmp." + id + ".wav");
 	let song = new Song(details.title, details.duration, id)
 	this.queue.push(song);
 	return song;

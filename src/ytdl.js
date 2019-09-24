@@ -1,5 +1,6 @@
 var child_process = require("child_process");
 var fs = require("fs");
+var caches = require("./caches.js");
 
 //new stuff below
 
@@ -24,38 +25,63 @@ exports.details = function(url) {
 
 exports.download = function(url, filename) {
 	let running = true;
-	let res = new Promise((resolve, reject) => {
-		let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--exec", "ffmpeg -i {} -ar 48000 -ac 1 -c:a pcm_s16le -f s16le -y " + filename + "; rm {}"];
-		// Only download the audio if it's on YouTube
-		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
-			args.push("-f");
-			args.push("bestaudio");
-			// That didn't work
-			//args.push("best"); // Because this format seems to be the least likely to have issues
-		} 
-		args.push(url);
-		console.debug("[INFO] Downloading " + url);
-		let proc = child_process.spawn("youtube-dl", args);
-		proc.on("exit", (code) => {
-			if (code == 0) {
-				running = false;
-				resolve();
-			}
-			else {
-				running = false;
-				reject("Error downloading link.");
-			}
-		});
-		proc.on("error", (e) => {
-			reject("Error downloading link.");
+	let res = new Promise(async (resolve, reject) => {
+		try {
+			let cacheName = await caches.pull(url);
+			await transcode(cacheName, filename);
+		}
+		catch (e) {
 			running = false;
-			console.log(e)
-		});
+			reject(e);
+		}
+		running = false;
+		resolve();
 	});
 	res.isRunning = () => {
 		return running;
 	};
 	return res;
+}
+
+exports.fetch = function(url, filename) {
+	return new Promise((resolve, reject) => {
+		let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-mtime", "-o", filename];
+		// Only download the audio if it's on YouTube
+		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
+			args.push("-f");
+			args.push("bestaudio");
+		} 
+		args.push(url);
+		console.debug("[INFO] Fetching " + url);
+		let proc = child_process.spawn("youtube-dl", args);
+		proc.on("exit", (code) => {
+			if (code == 0) {
+				resolve();
+			}
+			else {
+				reject("Error fetching link.");
+			}
+		});
+		proc.on("error", (e) => {
+			reject("Error fetching link.");
+			console.log(e)
+		});
+	});
+}
+
+function transcode(inF, outF) {
+	return new Promise((res, rej) => {
+		let args = ["-i", inF, "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", "-f", "s16le", "-y", outF];
+		console.debug("[INFO] Transcoding " + inF + " to " + outF);
+		let proc = child_process.spawn("ffmpeg", args);
+		proc.on("exit", (code) => {
+			if (code == 0) res();
+			else rej("Error transcoding: " + code);
+		});
+		proc.on("error", (e) => {
+			rej("Error transcoding: " + e);
+		});
+	});
 }
 
 // Returns promise that resolves when the first 3 songs have been added or all of the songs have been added.

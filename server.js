@@ -7,6 +7,9 @@ Playlist = require("./src/Playlist.js");
 
 var config = JSON.parse(fs.readFileSync("config.json")); 
 
+// Start cache cleanup routine
+require ("./src/caches.js").cleanup();
+
 const Modes = {
 		QUEUE: 0,
 		PLAYLIST: 1
