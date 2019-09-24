@@ -32,10 +32,10 @@ exports.download = function(url, filename) {
 		}
 		catch (e) {
 			running = false;
-			throw "Error downloading link.";
+			reject("Error downloading link.");
 		}
 		running = false;
-		return;
+		resolve();
 	});
 	res.isRunning = () => {
 		return running;
