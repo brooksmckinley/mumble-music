@@ -83,6 +83,21 @@ exports.fetch = async function(url, filename) {
 	});
 }
 
+exports.transcode = function(inF, outF) {
+	return new Promise((res, rej) => {
+		let args = ["-i", inF, "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", "-f", "s16le", "-y", outF];
+		console.debug("[INFO] Transcoding " + inF + " to " + outF);
+		let proc = child_process.spawn("ffmpeg", args);
+		proc.on("exit", (code) => {
+			if (code == 0) res();
+			else rej("Error transcoding: " + code);
+		});
+		proc.on("error", (e) => {
+			rej("Error transcoding: " + e);
+		});
+	});
+}
+
 // Returns promise that resolves when the first 3 songs have been added or all of the songs have been added.
 exports.populateQueue = function(url) {
 	return new Promise((resolve, reject) => {
