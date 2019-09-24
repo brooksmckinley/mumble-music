@@ -28,7 +28,7 @@ exports.download = function(url, filename) {
 	let res = new Promise(async (resolve, reject) => {
 		try {
 			let cacheName = await caches.pull(url);
-			transcode(cacheName, filename);
+			await transcode(cacheName, filename);
 		}
 		catch (e) {
 			running = false;
@@ -59,11 +59,11 @@ exports.fetch = function(url, filename) {
 				resolve();
 			}
 			else {
-				reject("Error downloading link.");
+				reject("Error fetching link.");
 			}
 		});
 		proc.on("error", (e) => {
-			reject("Error downloading link.");
+			reject("Error fetching link.");
 			console.log(e)
 		});
 	});
