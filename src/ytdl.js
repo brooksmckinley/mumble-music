@@ -32,7 +32,7 @@ exports.download = function(url, filename) {
 		}
 		catch (e) {
 			running = false;
-			reject("Error downloading link.");
+			reject(e);
 		}
 		running = false;
 		resolve();

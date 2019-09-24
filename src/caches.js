@@ -23,7 +23,7 @@ exports.pull = async function(url) {
 		return filename;
 	}
 	catch {
-		ytdl.fetch(url, filename);
+		await ytdl.fetch(url, filename);
 		return filename;
 	}
 }
