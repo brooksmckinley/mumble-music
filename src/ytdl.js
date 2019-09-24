@@ -1,5 +1,6 @@
 var child_process = require("child_process");
 var fs = require("fs");
+var caches = require("./caches.js");
 
 //new stuff below
 
@@ -24,33 +25,17 @@ exports.details = function(url) {
 
 exports.download = function(url, filename) {
 	let running = true;
-	let res = new Promise((resolve, reject) => {
-		let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--exec", "ffmpeg -i {} -ar 48000 -ac 1 -c:a pcm_s16le -f s16le -y " + filename + "; rm {}"];
-		// Only download the audio if it's on YouTube
-		if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
-			args.push("-f");
-			args.push("bestaudio");
-			// That didn't work
-			//args.push("best"); // Because this format seems to be the least likely to have issues
-		} 
-		args.push(url);
-		console.debug("[INFO] Downloading " + url);
-		let proc = child_process.spawn("youtube-dl", args);
-		proc.on("exit", (code) => {
-			if (code == 0) {
-				running = false;
-				resolve();
-			}
-			else {
-				running = false;
-				reject("Error downloading link.");
-			}
-		});
-		proc.on("error", (e) => {
-			reject("Error downloading link.");
+	let res = new Promise(async (resolve, reject) => {
+		try {
+			let cacheName = await caches.pull(url);
+			transcode(cacheName, filename);
+		}
+		catch (e) {
 			running = false;
-			console.log(e)
-		});
+			throw "Error downloading link.";
+		}
+		running = false;
+		return;
 	});
 	res.isRunning = () => {
 		return running;
@@ -84,7 +69,7 @@ exports.fetch = function(url, filename) {
 	});
 }
 
-exports.transcode = function(inF, outF) {
+function transcode(inF, outF) {
 	return new Promise((res, rej) => {
 		let args = ["-i", inF, "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", "-f", "s16le", "-y", outF];
 		console.debug("[INFO] Transcoding " + inF + " to " + outF);
