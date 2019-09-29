@@ -98,6 +98,7 @@ function onMessage(msg, user, connection) {
 	if (msg.startsWith("!playlist ")) {
 		if (mode == Modes.PLAYLIST) {
 			channel.sendMessage("Already playing a playlist!");
+			return;
 		}
 		let arg = msg.substring(10);
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
