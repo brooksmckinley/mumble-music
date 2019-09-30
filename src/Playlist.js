@@ -146,7 +146,7 @@ Playlist.prototype.isPlaying = function() {
 }
 
 Playlist.prototype.isPaused = function() {
-	if (this.player) return false;
+	if (!this.player) return false;
 	return this.player.isPaused;
 }
 
