@@ -1,6 +1,6 @@
 {
   "name": "mumble-music",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Mumble music bot",
   "main": "server.js",
   "author": "Brooks McKinley",
