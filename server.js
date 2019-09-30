@@ -27,7 +27,7 @@ function onMessage(msg, user, connection) {
 	if (mode == Modes.QUEUE) {
 		if (msg.startsWith("!play ")) {
 			let arg = msg.substring(6);
-			if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+			if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
 			let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 			console.info("[INFO] Trying to play " + url + " from " + user.name);
 
@@ -101,7 +101,7 @@ function onMessage(msg, user, connection) {
 			return;
 		}
 		let arg = msg.substring(10);
-		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+		if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
 		Playlist.startPlaylist(url, playlistID++, connection, channel, config, false, () => {
