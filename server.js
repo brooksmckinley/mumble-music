@@ -84,7 +84,7 @@ function onMessage(msg, user, connection) {
 			playlist.skip();
 		}
 		if ((msg == "!queue" || msg == "!q") && playlist.isPlaying()) {
-			res = "Now playing: " + playlist.nowPlaying.title + "<br>";
+			res = "Now playing: " + playlist.nowPlaying.title + " (" + playlist.getCurrentPos() + "/" + playlist.getCurrentDuration() + ")<br>";
 			if (playlist.nextSong)
 				res += "Next: " + playlist.nextSong.title;
 			channel.sendMessage(res);

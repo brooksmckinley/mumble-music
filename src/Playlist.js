@@ -1,3 +1,5 @@
+var hhmmss = require("hh-mm-ss");
+
 var Player = require("./Player.js"),
 ytdl = require("./ytdl.js");
 
@@ -128,6 +130,10 @@ Playlist.prototype._getNextSong = async function() {
 	
 }
 
+Playlist.prototype.getCurrentDuration = function() {
+	if (this.isPlaying()) return hhmmss.fromS(this.nowPlaying.duration);
+}
+
 Playlist.prototype.stop = function() {
 	this.player.stop();
 	this.isStopped = true;
@@ -173,5 +179,11 @@ Playlist.prototype.setGain = function(gain) {
 Playlist.prototype.getGain = function() {
 	if (this.player) {
 		return this.player.gain;
+	}
+}
+
+Playlist.prototype.getCurrentPos = function() {
+	if (this.player) {
+		return hhmmss.fromS(this.player.getCurrentPos());
 	}
 }
