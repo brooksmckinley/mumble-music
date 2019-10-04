@@ -104,7 +104,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, global.config, false, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, false, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
@@ -130,7 +130,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Shuffling playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, global.config, true, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, true, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
@@ -211,7 +211,7 @@ function connect() {
 			console.error("[ERR] Unable to connect to the mumble server.");
 			throw e;
 		}
-		queue = new SongQueue(global.config, connection);
+		queue = new SongQueue(connection);
 		connection.authenticate(global.config.name, global.config.password);
 		connection.on("initialized", () => {
 			// Set bitrate only if specified

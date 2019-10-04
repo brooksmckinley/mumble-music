@@ -9,9 +9,9 @@ const songPlaceholder = {
 		title: "Loading..."
 }
 
-exports.startPlaylist = async function(url, id, connection, channel, config, shuffle, callback) {
+exports.startPlaylist = async function(url, id, connection, channel, shuffle, callback) {
 	let queue = await ytdl.populateQueue(url);
-	let playlist = new Playlist(queue, url, id, connection, channel, config, callback);
+	let playlist = new Playlist(queue, url, id, connection, channel, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
 	playlist._start().catch((e) => {
@@ -21,7 +21,7 @@ exports.startPlaylist = async function(url, id, connection, channel, config, shu
 	return playlist;
 }
 
-function Playlist(queue, url, id, connection, channel, config, callback) {
+function Playlist(queue, url, id, connection, channel, callback) {
 	this.queue = queue;
 	this.url = url;
 	if (this.url.includes("youtube\.com")) 
@@ -35,7 +35,7 @@ function Playlist(queue, url, id, connection, channel, config, callback) {
 	this.nextSong = null;
 	this.ready = false;
 	this.lastID = 0;
-	this.maxDuration = config.maxlength;
+	this.maxDuration = global.config.maxlength;
 }
 
 // Fisher–Yates Shuffle O(n)

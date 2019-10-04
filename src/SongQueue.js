@@ -3,10 +3,10 @@ var Player = require("./Player.js");
 var fs = require("fs");
 var hhmmss = require("hh-mm-ss");
 
-function SongQueue(config, connection) {
+function SongQueue(connection) {
 	this.queue = [];
 	this.lastID = 0;
-	this.maxDuration = config.maxlength;
+	this.maxDuration = global.config.maxlength;
 	this.doNotStart = false;
 	this.connection = connection;
 } 
