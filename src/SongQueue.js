@@ -3,11 +3,12 @@ var Player = require("./Player.js");
 var fs = require("fs");
 var hhmmss = require("hh-mm-ss");
 
-function SongQueue(config) {
+function SongQueue(config, connection) {
 	this.queue = [];
 	this.lastID = 0;
 	this.maxDuration = config.maxlength;
 	this.doNotStart = false;
+	this.connection = connection;
 } 
 
 // Exposing data structures of the player
@@ -34,10 +35,10 @@ SongQueue.prototype.addSong = async function(url) {
 	return song;
 }
 
-SongQueue.prototype.start = async function(connection) {
+SongQueue.prototype.start = async function() {
 	if (this.doNotStart) return;
 	if (!this.player) {
-		this.player = new Player(connection);
+		this.player = new Player(this.connection);
 	}
 	if (!this.player.isPlaying) {
 		for (let song = this.queue.shift(); song != undefined; song = this.queue.shift()) {

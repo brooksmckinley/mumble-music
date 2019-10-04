@@ -17,7 +17,7 @@ const Modes = {
 
 var playing = false;
 var mode = Modes.QUEUE;
-var queue = new SongQueue(config);
+var queue;
 var playlist;
 var playlistID = 0; // ID for playlist temp files to prevent collisions
 var channel = undefined;
@@ -36,7 +36,7 @@ function onMessage(msg, user, connection) {
 				channel.sendMessage("Added \"" + song.name + "\" to queue.");
 				if (queue.isPaused())
 					channel.sendMessage("Bot is paused.");
-				queue.start(connection);
+				queue.start();
 			}).catch((e) => {
 				console.warn("[WARN] Error adding " + url + ": " + e);
 				channel.sendMessage("Error adding " + url + ": " + e);
@@ -66,7 +66,7 @@ function onMessage(msg, user, connection) {
 				channel.sendMessage("Added \"" + song.name + "\" to queue.");
 				if (queue.isPaused())
 					channel.sendMessage("Bot is paused.");
-				queue.start(connection);
+				queue.start();
 			}).catch((e) => {
 				console.warn("[WARN] Error adding \"" + arg + "\": " + e);
 				channel.sendMessage("Error adding \"" + arg + "\": " + e);
@@ -111,7 +111,7 @@ function onMessage(msg, user, connection) {
 			console.debug("[DEBUG] Playlist stopped.");
 			queue.doNotStart = false;
 			queue.resume();
-			queue.start(connection);
+			queue.start();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
@@ -140,7 +140,7 @@ function onMessage(msg, user, connection) {
 			console.debug("[DEBUG] Playlist stopped.");
 			queue.doNotStart = false;
 			queue.resume();
-			queue.start(connection);
+			queue.start();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
@@ -217,6 +217,7 @@ function connect() {
 			console.error("[ERR] Unable to connect to the mumble server.");
 			throw e;
 		}
+		queue = new SongQueue(config, connection);
 		connection.authenticate(config.name, config.password);
 		connection.on("initialized", () => {
 			// Set bitrate only if specified
