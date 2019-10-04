@@ -5,7 +5,7 @@ var ytdl = require("./src/ytdl.js"),
 SongQueue = require("./src/SongQueue.js"),
 Playlist = require("./src/Playlist.js");
 
-var config = JSON.parse(fs.readFileSync("config.json")); 
+global.config = JSON.parse(fs.readFileSync("config.json")); 
 
 // Start cache cleanup routine
 require ("./src/caches.js").cleanup();
@@ -104,7 +104,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, config, false, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, global.config, false, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
@@ -130,7 +130,7 @@ function onMessage(msg, user, connection) {
 		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
 		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
 		console.info("[INFO] Shuffling playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, config, true, () => {
+		Playlist.startPlaylist(url, playlistID++, connection, channel, global.config, true, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
@@ -202,25 +202,25 @@ function getTarget() {
 
 function connect() {
 	let options = null;
-	if (config.privkey && config.cert) options = {
-		key: fs.readFileSync(config.privkey),
-		cert: fs.readFileSync(config.cert)
+	if (global.config.privkey && global.config.cert) options = {
+		key: fs.readFileSync(global.config.privkey),
+		cert: fs.readFileSync(global.config.cert)
 	};
-	mumble.connect(config.server, options, (e, connection) => {
+	mumble.connect(global.config.server, options, (e, connection) => {
 		if (e) {
 			console.error("[ERR] Unable to connect to the mumble server.");
 			throw e;
 		}
-		queue = new SongQueue(config, connection);
-		connection.authenticate(config.name, config.password);
+		queue = new SongQueue(global.config, connection);
+		connection.authenticate(global.config.name, global.config.password);
 		connection.on("initialized", () => {
 			// Set bitrate only if specified
-			if (config.bitrate) connection.connection.setBitrate(config.bitrate);
-			channel = connection.channelByName(config.channel);
+			if (global.config.bitrate) connection.connection.setBitrate(global.config.bitrate);
+			channel = connection.channelByName(global.config.channel);
 			if (!channel) channel = connection.rootChannel;
 			// Automatically move back
 			connection.on("user-move", (user) => {
-				if (user.name == config.name) channel.join();
+				if (user.name == global.config.name) channel.join();
 			})
 			channel.join();
 		})
@@ -230,7 +230,7 @@ function connect() {
 		connection.connection.socket.socket._events.close.push(() => {
 			// Reset globals
 			playing = false;
-			queue = new SongQueue(config);
+			queue = new SongQueue(global.config);
 			channel = undefined;
 			// Reconnect
 			console.warn("[WARN] Connection lost. Reconnecting...")
