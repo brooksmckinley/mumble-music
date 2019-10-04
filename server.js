@@ -230,7 +230,7 @@ function connect() {
 		connection.connection.socket.socket._events.close.push(() => {
 			// Reset globals
 			playing = false;
-			queue = new SongQueue(global.config);
+			queue = undefined;
 			channel = undefined;
 			// Reconnect
 			console.warn("[WARN] Connection lost. Reconnecting...")
