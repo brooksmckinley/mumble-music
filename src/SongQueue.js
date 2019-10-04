@@ -80,11 +80,18 @@ SongQueue.prototype.pause = function() {
 	if (this.player) {
 		this.player.pause();
 	}
+	else {
+		this.doNotStart = true;
+	}
 }
 
 SongQueue.prototype.resume = function() {
 	if (this.player) {
 		this.player.resume();
+	}
+	else {
+		this.doNotStart = false;
+		this.start();
 	}
 }
 

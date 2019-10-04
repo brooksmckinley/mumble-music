@@ -109,16 +109,13 @@ function onMessage(msg, user, connection) {
 			mode = Modes.QUEUE;
 			playlist = undefined;
 			console.debug("[DEBUG] Playlist stopped.");
-			queue.doNotStart = false;
 			queue.resume();
-			queue.start();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
 			mode = Modes.PLAYLIST;
 			console.debug("[DEBUG] Playlist started.");
 			queue.pause();
-			queue.doNotStart = true;
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
 		});
@@ -138,16 +135,13 @@ function onMessage(msg, user, connection) {
 			mode = Modes.QUEUE;
 			playlist = undefined;
 			console.debug("[DEBUG] Playlist stopped.");
-			queue.doNotStart = false;
 			queue.resume();
-			queue.start();
 		}).then((pl) => {
 			playlist = pl;
 			// shift modes
 			mode = Modes.PLAYLIST;
 			console.debug("[DEBUG] Playlist started.");
 			queue.pause();
-			queue.doNotStart = true;
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
 		});
