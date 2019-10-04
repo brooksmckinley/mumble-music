@@ -7,6 +7,7 @@ function SongQueue(config) {
 	this.queue = [];
 	this.lastID = 0;
 	this.maxDuration = config.maxlength;
+	this.doNotStart = false;
 } 
 
 // Exposing data structures of the player
@@ -34,6 +35,7 @@ SongQueue.prototype.addSong = async function(url) {
 }
 
 SongQueue.prototype.start = async function(connection) {
+	if (this.doNotStart) return;
 	if (!this.player) {
 		this.player = new Player(connection);
 	}
