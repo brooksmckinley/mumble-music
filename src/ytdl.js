@@ -6,7 +6,13 @@ var downloads = new Map();
 
 exports.details = function(url) {
 	return new Promise((resolve, reject) => {
-		let proc = child_process.spawn("youtube-dl", ["-j", "--no-playlist", "--playlist-items", "1", url]);
+		let args = ["-j", "--no-playlist", "--playlist-items", "1"];
+		if (global.config.proxy) {
+			args.push("--proxy");
+			args.push(global.config.proxy);
+		}
+		args.push(url);
+		let proc = child_process.spawn("youtube-dl", args);
 		let data = "";
 		proc.stdout.on("data", (d) => data += d.toString());
 		proc.stdout.on("end", () => {
@@ -49,6 +55,10 @@ exports.fetch = function(url, filename) {
 	if (!promise) {
 		res = new Promise((resolve, reject) => {
 			let args = ["-f", "bestaudio/best", "--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-mtime", "-o", filename];
+			if (global.config.proxy) {
+				args.push("--proxy");
+				args.push(global.config.proxy);
+			}
 			args.push(url);
 			console.debug("[INFO] Fetching " + url);
 			let proc = child_process.spawn("youtube-dl", args);

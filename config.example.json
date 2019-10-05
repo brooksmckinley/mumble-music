@@ -6,6 +6,7 @@
     "name": "nodejs",
     "channel": "root",
     "cache": 2592000,
+    "proxy": null,
     "privkey": null,
     "cert": null
 }
