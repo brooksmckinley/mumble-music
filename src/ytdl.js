@@ -48,12 +48,7 @@ exports.fetch = function(url, filename) {
 	let res;
 	if (!promise) {
 		res = new Promise((resolve, reject) => {
-			let args = ["--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-mtime", "-o", filename];
-			// Only download the audio if it's on YouTube
-			if (url.match("^http(s)?://(www\.youtube\.com|youtu\.be|youtube\.com)") || url.startsWith("ytsearch:")) {
-				args.push("-f");
-				args.push("bestaudio");
-			} 
+			let args = ["-f", "bestaudio/best", "--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-mtime", "-o", filename];
 			args.push(url);
 			console.debug("[INFO] Fetching " + url);
 			let proc = child_process.spawn("youtube-dl", args);
