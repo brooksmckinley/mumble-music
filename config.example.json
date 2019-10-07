@@ -7,6 +7,8 @@
     "channel": "root",
     "cache": 2592000,
     "proxy": null,
+    "external_downloader": null,
+    "external_downloader_args": null,
     "privkey": null,
     "cert": null
 }

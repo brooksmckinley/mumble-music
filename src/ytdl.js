@@ -59,6 +59,14 @@ exports.fetch = function(url, filename) {
 				args.push("--proxy");
 				args.push(global.config.proxy);
 			}
+			if (global.config.external_downloader) {
+				args.push("--external-downloader");
+				args.push(global.config.external_downloader);
+			}
+			if (global.config.external_downloader_args) {
+				args.push("--external-downloader-args");
+				args.push(global.config.external_downloader_args);
+			}
 			args.push(url);
 			console.debug("[INFO] Fetching " + url);
 			let proc = child_process.spawn("youtube-dl", args);
