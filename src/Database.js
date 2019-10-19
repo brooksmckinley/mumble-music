@@ -7,8 +7,8 @@ function Database(name) {
 	}
 	catch {
 		this.db = {};
-		this.db.playlists = [];
-		this.db.songs = [];
+		this.db.playlists = {};
+		this.db.songs = {};
 		this._save();
 	}
 }
