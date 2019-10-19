@@ -1,7 +1,7 @@
 var fs = require('fs');
 
-function Database() {
-
+function Database(name) {
+	
 }
 
 Database.prototype.increment = function(song) {
