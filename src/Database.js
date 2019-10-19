@@ -26,7 +26,7 @@ Database.prototype.getTopTenPlaylists = function(user) {
 }
 
 Database.prototype._save = function() {
-	fs.writeFile(this.name, JSON.stringify(this.db));
+	fs.writeFileSync(this.name, JSON.stringify(this.db));
 }
 
 module.exports = Database;
