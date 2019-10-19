@@ -13,10 +13,13 @@ function Database(name) {
 	}
 }
 
-Database.prototype.increment = function(song) {
+Database.prototype.incrementSong = function(url) {
 }
 
-Database.prototype.getSong = function(song) {
+Database.prototype.incrementPlaylist = function(url) {
+}
+
+Database.prototype.getSong = function(url) {
 }
 
 Database.prototype.getTopTenSongs = function(user) {
