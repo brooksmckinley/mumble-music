@@ -13,6 +13,17 @@ function Database(name) {
 	}
 }
 
+function SongEntry(name, duration, plays) {
+	this.name = name;
+	this.duration = duration;
+	this.plays = plays;
+}
+
+function PlaylistEntry(name, plays) {
+	this.name = name;
+	this.plays = plays;
+}
+
 Database.prototype.incrementSong = function(url) {
 }
 
