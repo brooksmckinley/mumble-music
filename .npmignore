@@ -4,3 +4,4 @@ privkey.pem
 config.json
 caches/*
 .project
+statistics.json
