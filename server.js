@@ -3,7 +3,8 @@ fs = require("fs");
 
 var ytdl = require("./src/ytdl.js"),
 SongQueue = require("./src/SongQueue.js"),
-Playlist = require("./src/Playlist.js");
+Playlist = require("./src/Playlist.js"),
+Database = require("./src/Database.js");
 
 global.config = JSON.parse(fs.readFileSync("config.json")); 
 
