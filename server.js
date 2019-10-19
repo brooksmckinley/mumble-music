@@ -20,6 +20,7 @@ var playing = false;
 var mode = Modes.QUEUE;
 var queue;
 var playlist;
+var db = new Database("statistics.json");
 var playlistID = 0; // ID for playlist temp files to prevent collisions
 var channel = undefined;
 
