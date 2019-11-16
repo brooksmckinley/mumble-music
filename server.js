@@ -24,6 +24,7 @@ var db = new Database("statistics.json");
 var playlistID = 0; // ID for playlist temp files to prevent collisions
 var channel = undefined;
 
+// TODO: Please refactor
 function onMessage(msg, user, connection) {
 	// Queue mode commands
 	if (mode == Modes.QUEUE) {
@@ -35,6 +36,7 @@ function onMessage(msg, user, connection) {
 
 			queue.addSong(url).then((song) => {
 				console.info("[INFO] Added \"" + song.name + "\" to queue.");
+				db.incrementSong(url, song.name, song.duration);
 				channel.sendMessage("Added \"" + song.name + "\" to queue.");
 				if (queue.isPaused())
 					channel.sendMessage("Bot is paused.");
