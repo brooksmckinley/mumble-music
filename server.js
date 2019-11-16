@@ -198,6 +198,21 @@ function onMessage(msg, user, connection) {
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
 		"</ul>");
 	}
+	if (msg == "!top") {
+		let res = "<b>Top 10 songs: </b>";
+		res += "<ol>";
+		for (let song of db.getTopXSongs()) {
+			res += `<li>${song.name}</li>`;
+		}
+		res += "</ol>";
+		res += "<b>Top 10 playlists: </b>";
+		res += "<ol>";
+		for (let playlist of db.getTopXPlaylists()) {
+			res += `<li>${playlist.name}</li>`;
+		}
+		res += "</ol>";
+		channel.sendMessage(res);
+	}
 }
 
 function getTarget() {
