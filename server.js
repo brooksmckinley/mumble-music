@@ -119,6 +119,7 @@ function onMessage(msg, user, connection) {
 			// shift modes
 			mode = Modes.PLAYLIST;
 			console.debug("[DEBUG] Playlist started.");
+			db.incrementPlaylist(url, pl.name);
 			queue.pause();
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
