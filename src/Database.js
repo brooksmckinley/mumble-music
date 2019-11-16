@@ -48,14 +48,14 @@ Database.prototype.getSong = function(url) {
 	return this.db.songs[url];
 }
 
-// Get top X songs from user
+// Get top X songs
 // Defaults: Get top ten from entire server
-Database.prototype.getTopXSongs = function(user, x) {
+Database.prototype.getTopXSongs = function(x) {
 	
 }
 
 // Same as getTopXSongs
-Database.prototype.getTopXPlaylists = function(user, x) {
+Database.prototype.getTopXPlaylists = function(x) {
 }
 
 Database.prototype._save = function() {
