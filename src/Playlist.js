@@ -61,7 +61,10 @@ Playlist.prototype._start = async function() {
 			this.nextSong = songPlaceholder;
 			nextSong = this._getNextSong(); // Start getting next song immediately
 			nextSong.then((res) => { 
-				if (!res) return;
+				if (!res) {
+					this.nextSong = undefined;
+					return;
+				}
 				this.nextSong = res;
 				nextFile = ytdl.download(res.webpage_url, res.filename); // Seperate lines to preserve isRunning()
 				nextFile.catch((e) => {
