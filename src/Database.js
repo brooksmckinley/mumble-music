@@ -53,7 +53,7 @@ Database.prototype.getSong = function(url) {
 Database.prototype.getTopXSongs = function(x) {
 	if (!x) x = 10;
 	let tmpdb = Object.values(this.db.songs);
-	tmpdb.sort((song) => return song.plays);
+	tmpdb.sort((song) => { return song.plays });
 	return tmpdb.slice(0, x);
 }
 
@@ -61,7 +61,7 @@ Database.prototype.getTopXSongs = function(x) {
 Database.prototype.getTopXPlaylists = function(x) {
 	if (!x) x = 10;
 	let tmpdb = Object.values(this.db.playlists);
-	tmpdb.sort((entry) => return entry.plays);
+	tmpdb.sort((entry) => { return entry.plays });
 	return tmpdb.slice(0, x);
 }
 
