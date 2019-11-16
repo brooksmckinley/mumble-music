@@ -34,7 +34,14 @@ Database.prototype.incrementSong = function(url, name, duration) {
 	this._save();
 }
 
-Database.prototype.incrementPlaylist = function(url) {
+Database.prototype.incrementPlaylist = function(url, name) {
+	if (this.db.playlists[url]) {
+		this.db.playlists[url].plays++;
+	}
+	else {
+		this.db.playlists[url] = new PlaylistEntry(url, name);
+	}
+	this._save();
 }
 
 Database.prototype.getSong = function(url) {
