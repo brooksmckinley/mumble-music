@@ -45,6 +45,7 @@ Database.prototype.incrementPlaylist = function(url, name) {
 }
 
 Database.prototype.getSong = function(url) {
+	return this.db.songs[url];
 }
 
 Database.prototype.getTopTenSongs = function(user) {
