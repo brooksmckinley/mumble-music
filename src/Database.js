@@ -29,7 +29,7 @@ Database.prototype.incrementSong = function(url, name, duration) {
 		this.db.songs[url].plays++;
 	}
 	else {
-		this.db.songs[url] = new SongEntry(name, duration, 0);
+		this.db.songs[url] = new SongEntry(name, duration, 1);
 	}
 	this._save();
 }
@@ -39,7 +39,7 @@ Database.prototype.incrementPlaylist = function(url, name) {
 		this.db.playlists[url].plays++;
 	}
 	else {
-		this.db.playlists[url] = new PlaylistEntry(url, name);
+		this.db.playlists[url] = new PlaylistEntry(name, 1);
 	}
 	this._save();
 }
