@@ -125,7 +125,7 @@ exports.populateQueue = function(url) {
 			try {
 				let res = JSON.parse(data);
 				if (!res.entries) reject("Not a playlist.");
-				else resolve(res.entries);
+				else resolve(res);
 			}
 			catch (e) {
 				reject("Error parsing playlist");
