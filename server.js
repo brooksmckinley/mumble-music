@@ -36,7 +36,7 @@ function onMessage(msg, user, connection) {
 
 			queue.addSong(url).then((song) => {
 				console.info("[INFO] Added \"" + song.name + "\" to queue.");
-				db.incrementSong(url, song.name, song.duration);
+				db.incrementSong(song.url, song.name, song.duration);
 				channel.sendMessage("Added \"" + song.name + "\" to queue.");
 				if (queue.isPaused())
 					channel.sendMessage("Bot is paused.");
@@ -67,7 +67,7 @@ function onMessage(msg, user, connection) {
 
 			queue.addSong(url).then((song) => {
 				console.info("[INFO] Added \"" + song.name + "\" to queue.");
-				db.incrementSong(url, song.name, song.duration);
+				db.incrementSong(song.url, song.name, song.duration);
 				channel.sendMessage("Added \"" + song.name + "\" to queue.");
 				if (queue.isPaused())
 					channel.sendMessage("Bot is paused.");
