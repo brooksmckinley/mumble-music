@@ -205,13 +205,15 @@ function onMessage(msg, user, connection) {
 		let res = "<b>Top 10 songs: </b>";
 		res += "<ol>";
 		for (let song of db.getTopXSongs()) {
-			res += `<li>${song.name}</li>`;
+			let key = song[0];
+			let val = song[1];
+			res += `<li><a href="${key}">${val.name}</a></li>`;
 		}
 		res += "</ol>";
 		res += "<b>Top 10 playlists: </b>";
 		res += "<ol>";
 		for (let playlist of db.getTopXPlaylists()) {
-			res += `<li>${playlist.name}</li>`;
+			res += `<li><a href="${playlist.url}">${playlist.name}</a></li>`;
 		}
 		res += "</ol>";
 		channel.sendMessage(res);

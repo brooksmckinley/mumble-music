@@ -61,7 +61,9 @@ function compareSongsDesc(a, b) {
 // Defaults: Get top ten from entire server
 Database.prototype.getTopXSongs = function(x) {
 	if (!x) x = 10;
-	let tmpdb = Object.values(this.db.songs).sort(compareSongsDesc);
+	let tmpdb = Object.entries(this.db.songs).sort((a, b) => {
+		return compareSongsDesc(a[1], b[1]);
+	});
 	return tmpdb.slice(0, x);
 }
 
