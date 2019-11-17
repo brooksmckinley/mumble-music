@@ -12,7 +12,7 @@ const songPlaceholder = {
 exports.startPlaylist = async function(url, id, connection, channel, shuffle, callback) {
 	let ytdlPlaylist = await ytdl.populateQueue(url);
 	let queue = ytdlPlaylist.entries;
-	let playlist = new Playlist(queue, ytdlPlaylist.webpage_url, ytdlPlaylist.title, id, connection, channel, callback);
+	let playlist = new Playlist(queue, ytdlPlaylist.webpage_url, ytdlPlaylist.id, ytdlPlaylist.title, id, connection, channel, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
 	playlist._start().catch((e) => {
@@ -22,9 +22,10 @@ exports.startPlaylist = async function(url, id, connection, channel, shuffle, ca
 	return playlist;
 }
 
-function Playlist(queue, url, name, id, connection, channel, callback) {
+function Playlist(queue, url, ytdlID, name, id, connection, channel, callback) {
 	this.queue = queue;
 	this.url = url;
+	this.ytdlID = ytdlID;
 	this.name = name;
 	if (this.url.includes("youtube\.com")) 
 		this.youtube = true;

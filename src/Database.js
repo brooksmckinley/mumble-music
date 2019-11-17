@@ -19,8 +19,9 @@ function SongEntry(name, duration, plays) {
 	this.plays = plays;
 }
 
-function PlaylistEntry(name, plays) {
+function PlaylistEntry(name, url, plays) {
 	this.name = name;
+	this.url = url;
 	this.plays = plays;
 }
 
@@ -34,12 +35,14 @@ Database.prototype.incrementSong = function(url, name, duration) {
 	this._save();
 }
 
-Database.prototype.incrementPlaylist = function(url, name) {
-	if (this.db.playlists[url]) {
-		this.db.playlists[url].plays++;
+Database.prototype.incrementPlaylist = function(id, url, name) {
+	if (this.db.playlists[id]) {
+		this.db.playlists[id].plays++;
+		// Overwrite URL to last played, in case it changed since last time
+		this.db.playlists[id].url = url;
 	}
 	else {
-		this.db.playlists[url] = new PlaylistEntry(name, 1);
+		this.db.playlists[id] = new PlaylistEntry(name, url, 1);
 	}
 	this._save();
 }

@@ -120,7 +120,7 @@ function onMessage(msg, user, connection) {
 			// shift modes
 			mode = Modes.PLAYLIST;
 			console.debug("[DEBUG] Playlist started.");
-			db.incrementPlaylist(pl.url, pl.name);
+			db.incrementPlaylist(pl.ytdlID, pl.url, pl.name);
 			queue.pause();
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
@@ -147,7 +147,7 @@ function onMessage(msg, user, connection) {
 			// shift modes
 			mode = Modes.PLAYLIST;
 			console.debug("[DEBUG] Playlist started.");
-			db.incrementPlaylist(pl.url, pl.name);
+			db.incrementPlaylist(pl.ytdlID, pl.url, pl.name);
 			queue.pause();
 		}).catch((e) => {
 			channel.sendMessage("Error starting playlist: " + e);
