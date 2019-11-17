@@ -196,6 +196,7 @@ function onMessage(msg, user, connection) {
 				"<li><span style='font-family: monospace'>!queue</span>: Displays a list of all the songs in the queue.</li>" +
 				"<li><span style='font-family: monospace'>!vol [volume]</span>: Sets the volume of the music bot. Volume must be a number between 1 and 100.</li>" +
 				"<li><span style='font-family: monospace'>!help</span>: Displays this message.</li>" +
+				"<li><span style='font-family: monospace'>!top</span>: Displays the top songs.</li>" +
 		"</ul>");
 	}
 	if (msg == "!top") {
