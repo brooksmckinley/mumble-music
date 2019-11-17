@@ -30,7 +30,7 @@ SongQueue.prototype.addSong = async function(url) {
 	}
 	let id = this.lastID++;
 	await ytdl.download(details.webpage_url, ".tmp." + id + ".wav");
-	let song = new Song(details.title, details.duration, id)
+	let song = new Song(details.title, details.webpage_url, details.duration, id)
 	this.queue.push(song);
 	return song;
 }
@@ -113,8 +113,10 @@ SongQueue.prototype.getCurrentPos = function() {
 	}
 }
 
-function Song(name, duration, id) {
+// TODO: Eliminate the need for this type
+function Song(name, url, duration, id) {
 	this.name = name;
+	this.url = url;
 	this.duration = duration;
 	this.id = id;
 }
