@@ -48,20 +48,25 @@ Database.prototype.getSong = function(url) {
 	return this.db.songs[url];
 }
 
+function compareSongsDesc(a, b) {
+	if (a.plays > b.plays) return -1;
+	if (a.plays < b.plays) return 1;
+	return 0;
+}
+
 // Get top X songs
 // Defaults: Get top ten from entire server
 Database.prototype.getTopXSongs = function(x) {
 	if (!x) x = 10;
-	let tmpdb = Object.values(this.db.songs);
-	tmpdb.sort((song) => { return song.plays });
+	let tmpdb = Object.values(this.db.songs).sort(compareSongsDesc);
+	console.log(tmpdb);
 	return tmpdb.slice(0, x);
 }
 
 // Same as getTopXSongs
 Database.prototype.getTopXPlaylists = function(x) {
 	if (!x) x = 10;
-	let tmpdb = Object.values(this.db.playlists);
-	tmpdb.sort((entry) => { return entry.plays });
+	let tmpdb = Object.values(this.db.playlists).sort(compareSongsDesc);
 	return tmpdb.slice(0, x);
 }
 
