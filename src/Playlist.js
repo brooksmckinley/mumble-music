@@ -12,7 +12,7 @@ const songPlaceholder = {
 exports.startPlaylist = async function(url, id, connection, channel, shuffle, callback) {
 	let ytdlPlaylist = await ytdl.populateQueue(url);
 	let queue = ytdlPlaylist.entries;
-	let playlist = new Playlist(queue, url, ytdlPlaylist.title, id, connection, channel, callback);
+	let playlist = new Playlist(queue, ytdlPlaylist.webpage_url, ytdlPlaylist.title, id, connection, channel, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
 	playlist._start().catch((e) => {
