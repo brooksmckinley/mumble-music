@@ -28,12 +28,19 @@ var channel = undefined;
 function onMessage(msg, user, connection) {
 	// Queue mode commands
 	if (mode == Modes.QUEUE) {
-		if (msg.startsWith("!play ")) {
-			let arg = msg.substring(6);
-			if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
-			let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-			console.info("[INFO] Trying to play " + url + " from " + user.name);
-
+		if (msg.startsWith("!play ") || msg.startsWith("!search ")) {
+			let arg,url;
+			if (msg.startsWith("!play ")) {
+				arg = msg.substring(6);
+				if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
+				url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+				console.info("[INFO] Trying to play " + url + " from " + user.name);
+			}
+			else {
+				arg = msg.substring(8);
+				console.info("[INFO] Searching for " + arg);
+				url = "ytsearch:" + arg;
+			}
 			queue.addSong(url).then((song) => {
 				console.info("[INFO] Added \"" + song.name + "\" to queue.");
 				db.incrementSong(song.url, song.name, song.duration);
@@ -60,24 +67,6 @@ function onMessage(msg, user, connection) {
 			msg += queue.getQueue().replace(/\n/g, "<br>");
 			channel.sendMessage(msg);
 		}
-		if (msg.startsWith("!search ")) {
-			let arg = msg.substring(8);
-			console.info("[INFO] Searching for " + arg);
-			let url = "ytsearch:" + arg;
-
-			queue.addSong(url).then((song) => {
-				console.info("[INFO] Added \"" + song.name + "\" to queue.");
-				db.incrementSong(song.url, song.name, song.duration);
-				channel.sendMessage("Added \"" + song.name + "\" to queue.");
-				if (queue.isPaused())
-					channel.sendMessage("Bot is paused.");
-				queue.start();
-			}).catch((e) => {
-				console.warn("[WARN] Error adding \"" + arg + "\": " + e);
-				channel.sendMessage("Error adding \"" + arg + "\": " + e);
-			});
-		}
-
 	}
 	
 	// Playlist mode commands
