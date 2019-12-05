@@ -89,43 +89,27 @@ function onMessage(msg, user, connection) {
 	}
 
 	// Global commands
-	if (msg.startsWith("!playlist ")) {
+	if (msg.startsWith("!playlist ") || msg.startsWith("!shuffle ")) {
 		if (mode == Modes.PLAYLIST) {
 			channel.sendMessage("Already playing a playlist!");
 			return;
 		}
-		let arg = msg.substring(10);
-		if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
-		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-		console.info("[INFO] Starting playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, false, () => {
-			// shift modes back
-			mode = Modes.QUEUE;
-			playlist = undefined;
-			console.debug("[DEBUG] Playlist stopped.");
-			queue.resume();
-		}).then((pl) => {
-			playlist = pl;
-			// shift modes
-			mode = Modes.PLAYLIST;
-			console.debug("[DEBUG] Playlist started.");
-			db.incrementPlaylist(pl.ytdlID, pl.url, pl.name);
-			queue.pause();
-		}).catch((e) => {
-			channel.sendMessage("Error starting playlist: " + e);
-		});
-	}
-	// FIXME: Do this without repetition
-	if (msg.startsWith("!shuffle ")) {
-		if (mode == Modes.PLAYLIST) {
-			channel.sendMessage("Already playing a playlist!");
-			return;
+		let arg,url,shuffle;
+		if (msg.startsWith("!playlist ")) {
+			arg = msg.substring(10);
+			if (arg == "" || !arg.match(".*href=\"[^\"]*\".*")) return; // check for a link
+			url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+			shuffle = false;
+			console.info("[INFO] Starting playlist " + url);
 		}
-		let arg = msg.substring(9);
-		if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
-		let url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
-		console.info("[INFO] Shuffling playlist " + url);
-		Playlist.startPlaylist(url, playlistID++, connection, channel, true, () => {
+		else {
+			arg = msg.substring(9);
+			if (arg == "" || !arg.match(".*href=\"*\".*")) return; // check for a link
+			url = arg.substring(arg.indexOf("href=\"") + 6, arg.indexOf("\"", arg.indexOf("href=\"") + 6));
+			shuffle = true;
+			console.info("[INFO] Shuffling playlist " + url);
+		}
+		Playlist.startPlaylist(url, playlistID++, connection, channel, shuffle, () => {
 			// shift modes back
 			mode = Modes.QUEUE;
 			playlist = undefined;
