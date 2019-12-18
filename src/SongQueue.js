@@ -19,7 +19,7 @@ SongQueue.prototype.isPlaying = function() {
 }
 
 SongQueue.prototype.isPaused = function() {
-	if (!this.player) return false;
+	if (!this.player) return this.doNotStart;
 	return this.player.isPaused;
 }
 
