@@ -71,6 +71,7 @@ SongQueue.prototype.getQueueLength = function() {
 // Exposing functions of the player
 
 SongQueue.prototype.skip = function() {
+	this.resume()
 	if (this.player) {
 		this.player.stop();
 	}

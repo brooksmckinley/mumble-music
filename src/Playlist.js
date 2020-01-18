@@ -148,6 +148,7 @@ Playlist.prototype.stop = function() {
 
 Playlist.prototype.skip = function() {
 	this.player.stop();
+	this.resume();
 }
 
 //Exposing data structures of the player
