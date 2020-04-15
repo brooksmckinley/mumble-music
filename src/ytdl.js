@@ -67,6 +67,7 @@ exports.fetch = function(url, filename) {
 				args.push("--external-downloader-args");
 				args.push(global.config.external_downloader_args);
 			}
+			let data = "";
 			args.push(url);
 			console.debug("[INFO] Fetching " + url);
 			let proc = child_process.spawn("youtube-dl", args);
@@ -77,13 +78,16 @@ exports.fetch = function(url, filename) {
 				}
 				else {
 					downloads.delete(url);
+					console.err(data);
 					reject("Error fetching link.");
 				}
 			});
+			proc.stdout.on("data", (d) => data += d.toString());
 			proc.on("error", (e) => {
 				downloads.delete(url);
+				console.err(e);
+				console.err(data);
 				reject("Error fetching link.");
-				console.log(e)
 			});
 		});
 		downloads.set(url, res);

@@ -11,7 +11,6 @@ function getFilename(url) {
 }
 
 exports.cleanup = function() {
-	console.info("[DEBUG] Cleanup started.");
 	let timeout = JSON.parse(fs.readFileSync("config.json")).cache;
 	let minTime = Date.now() - (timeout * 1000);
 	if (!timeout) return; // If it's indefinite, return immediately
