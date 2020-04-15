@@ -15,7 +15,10 @@ exports.startPlaylist = async function(url, id, connection, channel, shuffle, ca
 	let playlist = new Playlist(queue, ytdlPlaylist.webpage_url, ytdlPlaylist.id, ytdlPlaylist.title, id, connection, channel, callback);
 	if (shuffle) playlist._shuffle();
 	//playlist._download().then(() => playlist._nextSong());
-	playlist._start().catch((e) => {
+	playlist._start().then(() => {
+		callback();
+	})
+	.catch((e) => {
 		callback();
 		throw e;
 	}); // callback if fail
@@ -106,7 +109,6 @@ Playlist.prototype._start = async function() {
 		song = await nextSong;
 		file = nextFile;
 	}
-	this.callback();
 }
 
 //Gets next PLAYABLE song
