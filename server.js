@@ -180,13 +180,13 @@ function onMessage(msg, user, connection) {
 		for (let song of db.getTopXSongs()) {
 			let key = song[0];
 			let val = song[1];
-			res += `<li><a href="${key}">${val.name}</a></li>`;
+			res += `<li><a href="${key}">${val.name}</a> (${val.plays} ${pluralizeIf("play", "plays", val.plays)})</li>`;
 		}
 		res += "</ol>";
 		res += "<b>Top 10 playlists: </b>";
 		res += "<ol>";
 		for (let playlist of db.getTopXPlaylists()) {
-			res += `<li><a href="${playlist.url}">${playlist.name}</a></li>`;
+			res += `<li><a href="${playlist.url}">${playlist.name}</a> (${playlist.plays} ${pluralizeIf("play", "plays", playlist.plays)})</li>`;
 		}
 		res += "</ol>";
 		channel.sendMessage(res);
@@ -196,6 +196,11 @@ function onMessage(msg, user, connection) {
 function getTarget() {
 	if (mode == Modes.QUEUE) return queue;
 	else if (mode == Modes.PLAYLIST) return playlist;
+}
+
+function pluralizeIf(word, plural, val) {
+	if (val == 1) return word;
+	else return plural;
 }
 
 function connect() {
