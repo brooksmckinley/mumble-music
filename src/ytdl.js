@@ -54,7 +54,7 @@ exports.fetch = function(url, filename) {
 	let res;
 	if (!promise) {
 		res = new Promise((resolve, reject) => {
-			let args = ["-f", "bestaudio/best", "--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-mtime", "-o", filename];
+			let args = ["-f", "bestaudio/best", "--no-playlist", "-R", "1", "--abort-on-unavailable-fragment", "--socket-timeout", "30", "--playlist-items", "1", "--no-continue", "--no-cache-dir", "--no-mtime", "-o", filename];
 			if (global.config.proxy) {
 				args.push("--proxy");
 				args.push(global.config.proxy);
