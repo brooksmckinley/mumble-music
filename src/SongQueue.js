@@ -8,6 +8,7 @@ function SongQueue(connection) {
 	this.lastID = 0;
 	this.maxDuration = global.config.maxlength;
 	this.doNotStart = false;
+	this.inLoop = false;
 	this.connection = connection;
 } 
 
@@ -30,7 +31,7 @@ SongQueue.prototype.addSong = async function(url) {
 	}
 	let id = this.lastID++;
 	await ytdl.download(details.webpage_url, ".tmp." + id + ".wav");
-	let song = new Song(details.title, details.webpage_url, details.duration, id)
+	let song = new Song(details.title, details.webpage_url, details.duration, id);
 	this.queue.push(song);
 	return song;
 }
@@ -40,11 +41,13 @@ SongQueue.prototype.start = async function() {
 	if (!this.player) {
 		this.player = new Player(this.connection);
 	}
-	if (!this.player.isPlaying) {
+	if (!this.inLoop) {
+		this.inLoop = true;
 		for (let song = this.queue.shift(); song != undefined; song = this.queue.shift()) {
 			this.nowPlaying = song;
 			await this.player.playFile(".tmp." + song.id + ".wav");
 		}
+		this.inLoop = false;
 	}
 }
 
