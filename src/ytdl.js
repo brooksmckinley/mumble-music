@@ -32,7 +32,7 @@ exports.details = function(url) {
 		proc.on("error", (e) => {
 			console.err(data);
 			reject("Error getting video information.");
-		}
+		});
 	});
 }
 
