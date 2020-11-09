@@ -15,6 +15,7 @@ exports.details = function(url) {
 		let proc = child_process.spawn("youtube-dl", args);
 		let data = "";
 		proc.stdout.on("data", (d) => data += d.toString());
+		proc.stderr.on("data", (d) => data += d.toString());
 		proc.stdout.on("end", () => {
 			try {
 				resolve(JSON.parse(data));
@@ -23,9 +24,15 @@ exports.details = function(url) {
 			}
 		});
 		proc.on("exit", (code) => {
-			if (code != 0) reject("Error getting video information.");
+			if (code != 0) {
+				console.err(data);
+				reject("Error getting video information.");
+			}
 		});
-		proc.on("error", (e) => reject("Error getting video information."));
+		proc.on("error", (e) => {
+			console.err(data);
+			reject("Error getting video information."));
+		}
 	});
 }
 
@@ -83,6 +90,7 @@ exports.fetch = function(url, filename) {
 				}
 			});
 			proc.stdout.on("data", (d) => data += d.toString());
+			proc.stderr.on("data", (d) => data += d.toString());
 			proc.on("error", (e) => {
 				downloads.delete(url);
 				console.error(e);
