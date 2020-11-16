@@ -25,12 +25,12 @@ exports.details = function(url) {
 		});
 		proc.on("exit", (code) => {
 			if (code != 0) {
-				console.err(data);
+				console.error(data);
 				reject("Error getting video information.");
 			}
 		});
 		proc.on("error", (e) => {
-			console.err(data);
+			console.error(data);
 			reject("Error getting video information.");
 		});
 	});
