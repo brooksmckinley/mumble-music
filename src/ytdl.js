@@ -6,7 +6,7 @@ var downloads = new Map();
 
 exports.details = function(url) {
 	return new Promise((resolve, reject) => {
-		let args = ["-j", "--no-playlist", "--playlist-items", "1"];
+		let args = ["-j", "--no-playlist", "--playlist-items", "1", "--restrict-filenames"];
 		if (global.config.proxy) {
 			args.push("--proxy");
 			args.push(global.config.proxy);
